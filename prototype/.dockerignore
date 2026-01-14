@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.gitignore
+*.md
+.vscode
+.eslintrc.cjs
+*.log
+.env*
+docker-compose.yml
+charts
+.github

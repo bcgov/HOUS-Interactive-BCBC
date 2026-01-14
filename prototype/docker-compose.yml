@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  bcbc-search-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bcbc-search-app
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
