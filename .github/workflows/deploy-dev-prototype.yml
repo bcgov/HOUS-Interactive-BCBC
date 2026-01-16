@@ -37,14 +37,6 @@ jobs:
           username: ${{ secrets.ARTIFACTORY_USERNAME }}
           password: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
-
-      - name: Set image tag
-        id: set-tag
-        run: |
-          TAG="${GITHUB_SHA::7}"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
