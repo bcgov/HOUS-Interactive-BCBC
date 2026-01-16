@@ -72,5 +72,5 @@ jobs:
             -f values-dev.yaml \
             --set image.repository=${{ vars.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPOSITORY_NAME }} \
             --set image.tag=${{ needs.build.outputs.image-tag }} \
-            --set imagePullSecrets[0].name=${{ secrets.IMAGE_PULL_SECRET_NAME }}
+            --set imagePullSecrets[0].name=${{ secrets.ARTIFACTORY_PASSWORD }}
         working-directory: ./prototype/charts/bcbc-search-app
