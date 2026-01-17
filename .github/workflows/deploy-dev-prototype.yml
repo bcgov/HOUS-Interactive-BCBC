@@ -1,4 +1,5 @@
 name: Deploy to Dev
+
 on:
   workflow_dispatch:
     inputs:
@@ -6,6 +7,7 @@ on:
         description: 'Image tag to deploy (e.g., PR number or commit SHA)'
         required: true
         default: 'latest'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -38,7 +40,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./prototype
+          file: ./prototype/Dockerfile
           push: true
           tags: |
             ${{ vars.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPOSITORY_NAME }}:${{ steps.set-tag.outputs.tag }}
@@ -60,7 +63,7 @@ jobs:
           tar -xzf openshift-client-linux.tar.gz
           sudo mv oc kubectl /usr/local/bin/
           oc version
-          
+
       - name: Login to OpenShift with CLI
         run: oc login --token=${{ secrets.OPENSHIFT_SERVICEACCOUNT_TOKEN }} --server=${{ secrets.OPENSHIFT_SERVER }}
 
