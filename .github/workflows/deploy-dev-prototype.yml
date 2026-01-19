@@ -44,8 +44,8 @@ jobs:
           file: ./prototype/Dockerfile
           push: true
           tags: |
-            ${{ vars.ARTIFACTORY_URL }}/hous-interactive-bcbc/dev:${{ steps.set-tag.outputs.tag }}
-            ${{ vars.ARTIFACTORY_URL }}/hous-interactive-bcbc/dev:latest
+            ${{ vars.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPOSITORY_NAME }}:${{ steps.set-tag.outputs.tag }}
+            ${{ vars.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPOSITORY_NAME }}:latest
 
           cache-from: type=gha
           cache-to: type=gha,mode=max
