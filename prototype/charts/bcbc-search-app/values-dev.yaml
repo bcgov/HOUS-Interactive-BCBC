@@ -1,4 +1,5 @@
 # Development environment values
+namespace: d6af69-dev
 replicaCount: 1
 
 resources:
