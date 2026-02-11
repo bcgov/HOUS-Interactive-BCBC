@@ -2,7 +2,7 @@ name: sync-from-repo-a
 
 on:
   workflow_run:
-    workflows: ["generate-artifact"]
+    workflows: ["Generate BC Building Code Artifact"]
     types:
       - completed
     # branches: [main]
