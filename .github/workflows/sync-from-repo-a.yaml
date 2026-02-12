@@ -1,18 +1,14 @@
 name: sync-from-repo-a
 
 on:
-  workflow_run:
-    workflows: ["Generate BC Building Code Artifact"]
-    types:
-      - completed
-    # branches: [main]
+  repository_dispatch:
+    types: [sync-from-repo-a]
 
 permissions:
   contents: write
 
 jobs:
   sync:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
