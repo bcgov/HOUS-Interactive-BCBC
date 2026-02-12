@@ -25,7 +25,7 @@ jobs:
           GH_TOKEN: ${{ secrets.REPO_A_READ_TOKEN }}
         run: |
           gh run download \
-            --repo bcgov/HOUS-BC-ARTIFACTS \
+            --repo bcgov/BC-Building-Code \
             --name bc-building-code-artifact \
             --dir incoming
 
