@@ -12,27 +12,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout destination repo
+      - name: Checkout destination repo branch
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.REPO_B_TOKEN }}
+          ref: ${{ github.event.client_payload.branch }}
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-files
-          path: incoming
+      - name: Install GitHub CLI
+        run: sudo apt install gh -y
+
+      - name: Download artifact from Repo A
+        env:
+          GH_TOKEN: ${{ secrets.REPO_A_READ_TOKEN }}
+        run: |
+          gh run download \
+            --repo bcgov/HOUS-BC-ARTIFACTS \
+            --name bc-building-code-artifact \
+            --dir incoming
 
       - name: Replace replica files
         run: |
-          # Ensure destination folders exist
           mkdir -p apps/web/public data/source
 
-          # Sync BOTH graphic folders into apps/web/public/
-          rsync -av --delete incoming/bc-graphic/ apps/web/public/bc-graphic/
+          rsync -av --delete incoming/bc-graphics/ apps/web/public/bc-graphics/
           rsync -av --delete incoming/graphics/ apps/web/public/graphics/
 
-          # Replace JSON schema files
           rsync -av incoming/bc-builing-code-schema.json data/source/
           rsync -av incoming/bcbc-2024.json data/source/
 
@@ -43,7 +46,5 @@ jobs:
 
           git add apps/web/public data/source
 
-          # Only commit if something changed
           git diff --staged --quiet || git commit -m "chore: sync generated files from Repo A (run $GITHUB_RUN_ID)"
-
           git push
