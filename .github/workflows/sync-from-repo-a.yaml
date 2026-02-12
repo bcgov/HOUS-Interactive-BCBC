@@ -28,17 +28,16 @@ jobs:
             --repo bcgov/BC-Building-Code \
             --name bc-building-code-artifact \
             --dir incoming
-            --pattern "*"
 
       - name: Replace replica files
         run: |
           mkdir -p apps/web/public data/source
 
-          rsync -av --delete incoming/bc-graphics/ apps/web/public/bc-graphics/
+          rsync -av --delete incoming/bc-building-code-artifact/bc-graphics/ apps/web/public/bc-graphics/
           rsync -av --delete incoming/graphics/ apps/web/public/graphics/
 
-          rsync -av incoming/bc-builing-code-schema.json data/source/
-          rsync -av incoming/bcbc-2024.json data/source/
+          rsync -av incoming/bc-building-code-artifact/bc-builing-code-schema.json data/source/
+          rsync -av incoming/bc-building-code-artifact/bcbc-2024.json data/source/
 
       - name: Commit and push changes
         run: |
