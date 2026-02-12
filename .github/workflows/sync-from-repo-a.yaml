@@ -28,6 +28,7 @@ jobs:
             --repo bcgov/BC-Building-Code \
             --name bc-building-code-artifact \
             --dir incoming
+            --pattern "*"
 
       - name: Replace replica files
         run: |
