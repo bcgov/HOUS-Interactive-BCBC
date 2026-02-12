@@ -36,7 +36,7 @@ jobs:
           rsync -av --delete incoming/bc-graphics/ apps/web/public/bc-graphics/
           rsync -av --delete incoming/graphics/ apps/web/public/graphics/
 
-          rsync -av incoming/json-generation-pipeline/output/bc-builing-code-schema.json data/source/
+          rsync -av incoming/json-generation-pipeline/output/bc-building-code-schema.json data/source/
           rsync -av incoming/json-generation-pipeline/output/bcbc-2024.json data/source/
 
       - name: Commit and push changes
