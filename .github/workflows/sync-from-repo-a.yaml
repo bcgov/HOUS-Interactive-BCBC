@@ -39,12 +39,27 @@ jobs:
           rsync -av incoming/json-generation-pipeline/output/bc-building-code-schema.json data/source/
           rsync -av incoming/json-generation-pipeline/output/bcbc-2024.json data/source/
 
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+      #The commented section commits directly to the branch
+      # - name: Commit and push changes
+      #   run: |
+      #     git config user.name "github-actions"
+      #     git config user.email "github-actions@github.com"
 
-          git add apps/web/public data/source
+      #     git add apps/web/public data/source
 
-          git diff --staged --quiet || git commit -m "chore: sync generated files from Repo A (run $GITHUB_RUN_ID)"
-          git push
+      #     git diff --staged --quiet || git commit -m "chore: sync generated files from Repo A (run $GITHUB_RUN_ID)"
+      #     git push
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: sync generated files from Repo A (run ${{ github.run_id }})"
+          branch: repo-a-sync-${{ github.run_id }}
+          title: "Sync generated files from Repo A"
+          body: "Automated artifact sync from Repo A"
+          delete-branch: true
+          base: feature/IC2026-19_syncrepo2repo
+          add-paths: |
+            apps/web/public
+            data/source
