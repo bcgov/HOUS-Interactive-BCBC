@@ -55,10 +55,10 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: sync generated files from Repo A (run ${{ github.run_id }})"
-          branch: repo-a-sync-${{ github.run_id }}
-          title: "Sync generated files from Repo A"
-          body: "Automated artifact sync from Repo A"
+          commit-message: "chore: sync generated files from Repo BC-Building-Code (run ${{ github.run_id }})"
+          branch: repo-sync-${{ github.run_id }}
+          title: "Sync generated files from Repo BC-Building-Code"
+          body: "Automated artifact sync from Repo BC-Building-Code"
           delete-branch: true
           base: feature/IC2026-19_syncrepo2repo
           add-paths: |
