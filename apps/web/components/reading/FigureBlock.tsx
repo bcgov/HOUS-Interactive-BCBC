@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Figure } from '@bc-building-code/bcbc-parser';
+import { resolveImagePath } from '../../lib/image-config';
 import './FigureBlock.css';
 
 type RawFigureGraphic = {
@@ -19,29 +20,8 @@ export interface FigureBlockProps {
 }
 
 export const FigureBlock: React.FC<FigureBlockProps> = ({ figure }) => {
-  // Determine the full image path
-  const getImagePath = (src?: string): string | null => {
-    if (!src || typeof src !== 'string') {
-      return null;
-    }
-
-    // If src already starts with /, use it as-is but lowercase for case-insensitive matching
-    if (src.startsWith('/')) {
-      return src.toLowerCase();
-    }
-
-    // Handle bc-graphics/ paths - strip the prefix
-    let normalizedSrc = src.replace(/^\/?bc-graphics\//i, '');
-    
-    // Convert .eps to .jpg and lowercase everything for case-insensitive matching
-    const convertedSrc = normalizedSrc.replace(/\.eps$/i, '.jpg').toLowerCase();
-
-    // Use normalized root-relative asset path.
-    return `/${convertedSrc}`;
-  };
-
   const rawImageSrc = figure.imageUrl || figure.graphic?.src;
-  const imagePath = getImagePath(rawImageSrc);
+  const imagePath = resolveImagePath(rawImageSrc);
   const altText = figure.altText || figure.graphic?.alt_text || figure.title || 'Figure';
   const figureLabel = figure.number ? `Figure ${figure.number}` : 'Figure';
 

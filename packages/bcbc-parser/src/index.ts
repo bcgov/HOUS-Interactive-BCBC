@@ -32,6 +32,7 @@ export type {
   ContentType,
   HierarchyLevel,
   Revision,
+  Definition,
 } from './types';
 
 // Export parser functions

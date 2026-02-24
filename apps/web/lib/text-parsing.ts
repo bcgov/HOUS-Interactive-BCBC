@@ -98,39 +98,68 @@ function sanitizeLegacyPlaceholderTags(text: string): string {
   return text.replace(/<>/g, '').replace(/<\/>/g, '');
 }
 
-function parseInlineScriptNotation(text: string, absoluteStart: number = 0): React.ReactNode[] {
-  if (!text || (!text.includes('_{') && !text.includes('^{'))) {
+/**
+ * Parse text with inline formatting tags (italic, bold) and script notation
+ * Returns array of React nodes with proper formatting applied
+ */
+function parseInlineFormatting(text: string, interactive: boolean = true, startIndex: number = 0): React.ReactNode[] {
+  if (!text) {
+    return [text];
+  }
+
+  // Check if text contains any formatting tags or script notation
+  if (!text.includes('<italic>') && !text.includes('<bold>') && !text.includes('_{') && !text.includes('^{')) {
     return [text];
   }
 
   const nodes: React.ReactNode[] = [];
-  const scriptRegex = /(_\{[^{}]+\}|\^\{[^{}]+\})/g;
+  // Match italic, bold, subscript, and superscript patterns
+  const formatRegex = /(<italic>[\s\S]*?<\/italic>|<bold>[\s\S]*?<\/bold>|_\{[^{}]+\}|\^\{[^{}]+\})/gi;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
-  while ((match = scriptRegex.exec(text)) !== null) {
+  while ((match = formatRegex.exec(text)) !== null) {
     const token = match[0];
-    const start = match.index;
-    const end = scriptRegex.lastIndex;
-    const keySuffix = absoluteStart + start;
+    const matchStart = match.index;
+    const matchEnd = formatRegex.lastIndex;
+    const keyIndex = startIndex + matchStart;
 
-    if (start > lastIndex) {
-      nodes.push(text.substring(lastIndex, start));
+    // Add plain text before this match
+    if (matchStart > lastIndex) {
+      nodes.push(text.substring(lastIndex, matchStart));
     }
 
-    if (token.startsWith('_{')) {
+    // Handle different formatting types
+    if (/^<italic>/i.test(token)) {
+      const italicText = token.replace(/^<italic>/i, '').replace(/<\/italic>$/i, '');
       nodes.push(
-        React.createElement('sub', { key: `inline-sub-${keySuffix}` }, token.slice(2, -1))
+        React.createElement('em', { key: `italic-${keyIndex}` },
+          ...parseInlineFormatting(italicText, interactive, keyIndex)
+        )
       );
-    } else {
+    } else if (/^<bold>/i.test(token)) {
+      const boldText = token.replace(/^<bold>/i, '').replace(/<\/bold>$/i, '');
       nodes.push(
-        React.createElement('sup', { key: `inline-sup-${keySuffix}` }, token.slice(2, -1))
+        React.createElement('strong', { key: `bold-${keyIndex}` },
+          ...parseInlineFormatting(boldText, interactive, keyIndex)
+        )
+      );
+    } else if (token.startsWith('_{')) {
+      // Subscript
+      nodes.push(
+        React.createElement('sub', { key: `sub-${keyIndex}` }, token.slice(2, -1))
+      );
+    } else if (token.startsWith('^{')) {
+      // Superscript
+      nodes.push(
+        React.createElement('sup', { key: `sup-${keyIndex}` }, token.slice(2, -1))
       );
     }
 
-    lastIndex = end;
+    lastIndex = matchEnd;
   }
 
+  // Add remaining text
   if (lastIndex < text.length) {
     nodes.push(text.substring(lastIndex));
   }
@@ -751,8 +780,9 @@ export function parseTextWithMarkers(
     // Add plain text before the marker
     if (marker.start > lastIndex) {
       nodes.push(
-        ...parseInlineScriptNotation(
+        ...parseInlineFormatting(
           sanitizedText.substring(lastIndex, marker.start),
+          interactive,
           lastIndex
         )
       );
@@ -959,16 +989,17 @@ export function parseTextWithMarkers(
   // Add remaining text after last marker
   if (lastIndex < sanitizedText.length) {
       nodes.push(
-        ...parseInlineScriptNotation(
+        ...parseInlineFormatting(
           sanitizedText.substring(lastIndex),
+          interactive,
           lastIndex
         )
       );
   }
   
-  // If no markers found, return the original text
+  // If no markers found, return the original text with formatting
   if (nodes.length === 0) {
-    nodes.push(sanitizedText);
+    return parseInlineFormatting(sanitizedText, interactive, 0);
   }
   
   return nodes;

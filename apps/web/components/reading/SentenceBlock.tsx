@@ -3,6 +3,7 @@
  * 
  * Sentences contain:
  * - Text with glossary term markers
+ * - Optional definitions list (for "Defined Terms" articles)
  * - Optional nested clauses, tables, figures, equations
  * 
  * Supports effective date filtering to show correct revision
@@ -12,6 +13,7 @@ import React from 'react';
 import type { Sentence } from '@bc-building-code/bcbc-parser';
 import { filterSentence } from '@bc-building-code/bcbc-parser';
 import { ContentRenderer } from './ContentRenderer';
+import { DefinitionsList } from './DefinitionsList';
 import { parseTextWithMarkers } from '../../lib/text-parsing';
 import './SentenceBlock.css';
 
@@ -40,6 +42,14 @@ export const SentenceBlock: React.FC<SentenceBlockProps> = ({
         <div className="sentenceText">
           {parseTextWithMarkers(filteredSentence.text, filteredSentence.glossaryTerms || [], interactive, sentenceEquations)}
         </div>
+        
+        {/* Render definitions list if present */}
+        {filteredSentence.definitions && filteredSentence.definitions.length > 0 && (
+          <DefinitionsList 
+            definitions={filteredSentence.definitions}
+            interactive={interactive}
+          />
+        )}
         
         {/* Render nested content (clauses, tables, figures, equations) */}
         {filteredSentence.content && filteredSentence.content.length > 0 && (

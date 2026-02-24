@@ -216,6 +216,15 @@ export interface Revision {
 export type SentenceContentNode = Clause | Table | Figure | Equation;
 
 /**
+ * Definition entry within a sentence
+ */
+export interface Definition {
+  id: string;
+  term: string;
+  definition: string;
+}
+
+/**
  * Sentence within an article
  */
 export interface Sentence {
@@ -224,6 +233,7 @@ export interface Sentence {
   type: 'sentence';
   text: string;
   glossaryTerms: string[];
+  definitions?: Definition[];
   content?: SentenceContentNode[];
   revisions?: Revision[];
   revised?: boolean;
