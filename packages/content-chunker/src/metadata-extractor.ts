@@ -194,11 +194,15 @@ function buildDivisionNode(division: any): NavigationNode {
       for (const subsection of section.subsections) {
         // NEW: Hierarchical numbering (Part.Section.Subsection)
         const subsectionNumber = `${sectionNumber}.${subsection.number}`;
+        // Handle subsection title as either string or revision history object
+        const subsectionTitle = typeof subsection.title === 'string' 
+          ? subsection.title 
+          : subsection.title.text;
         const subsectionNode: NavigationNode = {
           id: subsection.id,
           type: 'subsection',
           number: subsectionNumber,
-          title: `${subsectionNumber} ${subsection.title}`,
+          title: `${subsectionNumber} ${subsectionTitle}`,
           path: `/code/${division.id}/${part.number}/${section.number}/${subsection.number}`,
           children: [],
         };

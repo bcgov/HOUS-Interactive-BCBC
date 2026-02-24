@@ -313,9 +313,14 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
         );
 
         if (subsection) {
+          // Handle subsection title - after revision resolution it should be a string
+          const subsectionTitle = typeof subsection.title === 'string' 
+            ? subsection.title 
+            : (subsection.title as any)?.text || '';
+          
           return {
             referenceId,
-            heading: subsection.title.trim(),
+            heading: subsectionTitle.trim(),
             mode: 'subsection',
             section,
             subsection,
