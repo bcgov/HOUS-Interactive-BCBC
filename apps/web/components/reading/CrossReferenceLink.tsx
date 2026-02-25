@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Icon from '@repo/ui/icon';
 import { isModalReference, parseReferenceId } from '../../lib/cross-reference';
+import { resolvePartAppendixForEffectiveDate } from '../../lib/revision-resolver';
 import { useCrossReferenceContext } from './CrossReferenceContext';
 import { useNavigationStore, type NavigationNode } from '../../stores/navigation-store';
 import { useAppendixStore } from '../../lib/stores/appendix-store';
@@ -52,6 +53,7 @@ export const CrossReferenceLink: React.FC<CrossReferenceLinkProps> = ({
   const { openReference, navigateReference } = useCrossReferenceContext();
   const searchParams = useSearchParams();
   const version = searchParams.get('version') || '2024';
+  const effectiveDate = searchParams.get('date') || undefined;
   const fetchAppendix = useAppendixStore((s) => s.fetchAppendix);
   const navigationTree = useNavigationStore((s) => s.navigationTree);
   const [appnoteDisplayText, setAppnoteDisplayText] = useState<string | null>(null);
@@ -109,8 +111,12 @@ export const CrossReferenceLink: React.FC<CrossReferenceLinkProps> = ({
           parsedReference.division,
           parsedReference.part
         )) as PartAppendixPayload;
+        const resolvedAppendixPayload = resolvePartAppendixForEffectiveDate(
+          appendixPayload as any,
+          effectiveDate
+        ) as PartAppendixPayload;
         notesMap = new Map<string, ApplicationNoteMeta>();
-        for (const note of appendixPayload.application_notes || []) {
+        for (const note of resolvedAppendixPayload.application_notes || []) {
           notesMap.set(note.id, note);
         }
       } catch {
@@ -151,7 +157,7 @@ export const CrossReferenceLink: React.FC<CrossReferenceLinkProps> = ({
     return () => {
       active = false;
     };
-  }, [fetchAppendix, format, isPartAppendixAppnote, parsedReference, referenceId, version]);
+  }, [effectiveDate, fetchAppendix, format, isPartAppendixAppnote, parsedReference, referenceId, version]);
 
   useEffect(() => {
     let active = true;
