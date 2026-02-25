@@ -9,6 +9,7 @@ type RevisionRecord = {
 type ContentNode = {
   id?: string;
   type?: string;
+  title?: unknown;
   revisions?: RevisionRecord[];
   [key: string]: unknown;
 };

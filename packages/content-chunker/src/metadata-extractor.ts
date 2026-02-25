@@ -15,7 +15,7 @@ import type {
  */
 export interface NavigationNode {
   id: string;
-  type: 'volume' | 'division' | 'part' | 'section' | 'subsection' | 'article';
+  type: 'volume' | 'division' | 'part' | 'section' | 'subsection' | 'article' | 'part_appendix';
   number?: string;
   title: string;
   path: string;
@@ -225,6 +225,15 @@ function buildDivisionNode(division: any): NavigationNode {
       }
 
       partNode.children?.push(sectionNode);
+    }
+
+    if (part.appendix && part.appendix.type === 'part_appendix') {
+      partNode.children?.push({
+        id: part.appendix.id,
+        type: 'part_appendix',
+        title: 'Appendix',
+        path: `/code/${division.id}/${part.number}/appendix`,
+      });
     }
 
     divisionNode.children?.push(partNode);
