@@ -102,6 +102,12 @@
   display: block;
 }
 
+.glossary-tooltip__definition .glossary-term,
+.glossary-tooltip__definition .cross-reference-link,
+.glossary-tooltip__definition .note-reference--non-interactive {
+  color: inherit;
+}
+
 /* Hide tooltip on touch devices (Requirement 11.17) */
 @media (hover: none) {
   .glossary-tooltip {

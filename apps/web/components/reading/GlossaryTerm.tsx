@@ -18,6 +18,7 @@ import { createPortal } from 'react-dom';
 import type { GlossaryTermProps } from '@repo/data';
 import { useGlossaryStore } from '../../stores/glossary-store';
 import { useUIStore } from '../../lib/stores/ui-store';
+import { parseTextWithMarkers } from '../../lib/text-parsing';
 import './GlossaryTerm.css';
 
 export const GlossaryTerm: React.FC<GlossaryTermProps> = ({
@@ -173,7 +174,7 @@ export const GlossaryTerm: React.FC<GlossaryTermProps> = ({
           >
             <span className="glossary-tooltip__term">{definition.term}</span>
             <span className="glossary-tooltip__definition">
-              {definition.definition}
+              {parseTextWithMarkers(definition.definition, [], false)}
             </span>
           </span>
           ,
