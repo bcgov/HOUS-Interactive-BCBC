@@ -552,7 +552,9 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
       
       const nodeId = findNodeIdByPath(navigationTree);
       if (nodeId) {
-        expandToNode(nodeId);
+        // On reading routes, URL path is the source of truth for open tree state.
+        // Replace existing expansion so homepage defaults or prior state do not leak in.
+        expandToNode(nodeId, { replaceExpandedNodes: true });
       }
     };
     
