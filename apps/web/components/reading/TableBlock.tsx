@@ -237,7 +237,12 @@ const normalizeRows = (rows: RawTableRow[], isHeader: boolean, effectiveDate?: s
       cells: ReturnType<typeof normalizeCell>[];
     }>;
 
-type NormalizedTableRow = ReturnType<typeof normalizeRows>[number];
+type TableWidthAnalysisRow = {
+  cells: Array<{
+    content: string | TableCellContent[];
+    colspan?: number;
+  }>;
+};
 
 const getCellPlainText = (content: string | TableCellContent[]): string => {
   if (typeof content === 'string') {
@@ -265,7 +270,7 @@ const getLongestTokenLength = (text: string): number => {
 };
 
 const analyzeTableWidth = (
-  rows: NormalizedTableRow[],
+  rows: TableWidthAnalysisRow[],
   maxColumnCount: number
 ): { preferHorizontalScroll: boolean; minWidthRem: number } => {
   if (maxColumnCount === 0) {
