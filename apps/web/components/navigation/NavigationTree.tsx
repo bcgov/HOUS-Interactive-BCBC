@@ -237,9 +237,9 @@ export function NavigationTree({ className = '', onNodeClick }: NavigationTreePr
    */
   const getPaddingLeft = (level: number): string => {
     if (level === 0) {
-      return '0px'; // Parent level - no padding on container
+      return '0px';
     }
-    return `${32 + (level - 1) * 16}px`; // Child levels: 32px, 48px, 64px, etc.
+    return `${32 + (level - 1) * 16}px`;
   };
 
   /**
