@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Icon from '@repo/ui/icon';
 import { useVersionStore } from '@/stores/version-store';
 import {
+  type DownloadOptionsResponse,
   type DownloadVersionOptions,
   formatEffectiveDate,
   loadDownloadOptions,
@@ -12,15 +13,71 @@ import {
 } from '@/lib/download-options';
 import './DownloadPage.css';
 
+function appendTextWithLineBreaks(text: string, nodes: ReactNode[], keySeed: { value: number }): void {
+  const lines = text.split('\n');
+  lines.forEach((line, index) => {
+    if (line.length > 0) {
+      nodes.push(line);
+    }
+    if (index < lines.length - 1) {
+      nodes.push(<br key={`line-break-${keySeed.value}`} />);
+      keySeed.value += 1;
+    }
+  });
+}
+
+function renderDescriptionWithLinks(description: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  const keySeed = { value: 0 };
+  const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null = null;
+
+  while ((match = linkPattern.exec(description)) !== null) {
+    if (match.index > lastIndex) {
+      appendTextWithLineBreaks(description.slice(lastIndex, match.index), nodes, keySeed);
+    }
+
+    nodes.push(
+      <a
+        key={`description-link-${keySeed.value}`}
+        href={match[2]}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="download-revision-card__inline-link"
+      >
+        {match[1]}
+      </a>
+    );
+    keySeed.value += 1;
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < description.length) {
+    appendTextWithLineBreaks(description.slice(lastIndex), nodes, keySeed);
+  }
+
+  return nodes;
+}
+
 export default function DownloadPage() {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const availableVersions = useVersionStore((state) => state.availableVersions);
   const currentVersion = useVersionStore((state) => state.currentVersion);
-  const [activeVersion, setActiveVersion] = useState<DownloadVersionOptions | null>(null);
+  const setCurrentVersion = useVersionStore((state) => state.setCurrentVersion);
+  const [downloadOptions, setDownloadOptions] = useState<DownloadOptionsResponse | null>(null);
+  const [selectedVersionId, setSelectedVersionId] = useState<string>('2024');
   const [selectedCodePdf, setSelectedCodePdf] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const requestedVersion = searchParams.get('version') || currentVersion || '2024';
+
+  useEffect(() => {
+    setSelectedVersionId(requestedVersion);
+  }, [requestedVersion]);
 
   useEffect(() => {
     let cancelled = false;
@@ -31,15 +88,13 @@ export default function DownloadPage() {
 
       try {
         const response = await loadDownloadOptions();
-        const selected = selectDownloadVersion(response, requestedVersion);
         if (cancelled) return;
 
-        setActiveVersion(selected);
-        setSelectedCodePdf(selected?.codePdfs[0]?.pdfLink || '');
+        setDownloadOptions(response);
       } catch (err) {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : 'Unable to load download options.');
-        setActiveVersion(null);
+        setDownloadOptions(null);
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -52,7 +107,34 @@ export default function DownloadPage() {
     return () => {
       cancelled = true;
     };
-  }, [requestedVersion]);
+  }, []);
+
+  const activeVersion: DownloadVersionOptions | null = useMemo(() => {
+    if (!downloadOptions) {
+      return null;
+    }
+    return selectDownloadVersion(downloadOptions, selectedVersionId);
+  }, [downloadOptions, selectedVersionId]);
+
+  useEffect(() => {
+    setSelectedCodePdf(activeVersion?.codePdfs[0]?.pdfLink || '');
+  }, [activeVersion?.versionId]);
+
+  const codeVersionOptions = useMemo(() => {
+    if (availableVersions.length > 0) {
+      return availableVersions.map((version) => ({
+        id: version.id,
+        label: version.title,
+      }));
+    }
+
+    return (
+      downloadOptions?.versions.map((version) => ({
+        id: version.versionId,
+        label: `BC Building Code ${version.versionId}`,
+      })) || []
+    );
+  }, [availableVersions, downloadOptions]);
 
   const selectedCodeOption = useMemo(
     () => activeVersion?.codePdfs.find((option) => option.pdfLink === selectedCodePdf) ?? activeVersion?.codePdfs[0],
@@ -70,6 +152,19 @@ export default function DownloadPage() {
   if (!activeVersion) {
     return <div className="download-page">No download options are available.</div>;
   }
+
+  const handleVersionChange = (nextVersionId: string) => {
+    setSelectedVersionId(nextVersionId);
+
+    if (availableVersions.some((version) => version.id === nextVersionId)) {
+      setCurrentVersion(nextVersionId);
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('version', nextVersionId);
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
   return (
     <section className="download-page" data-testid="download-page">
@@ -91,12 +186,12 @@ export default function DownloadPage() {
                 <select
                   id="code-version-pdf"
                   className="download-card__select"
-                  value={selectedCodePdf}
-                  onChange={(event) => setSelectedCodePdf(event.target.value)}
-                  aria-label="Select code PDF to open"
+                  value={selectedVersionId}
+                  onChange={(event) => handleVersionChange(event.target.value)}
+                  aria-label="Select code version"
                 >
-                  {activeVersion.codePdfs.map((option) => (
-                    <option key={`${option.year}-${option.pdfLink}`} value={option.pdfLink}>
+                  {codeVersionOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
                       {option.label}
                     </option>
                   ))}
@@ -110,7 +205,7 @@ export default function DownloadPage() {
                 rel="noopener noreferrer"
                 aria-label={`Open ${selectedCodeOption?.label || 'selected code PDF'} in a new tab`}
               >
-                <Icon type="download" />
+                <Icon type="download" className="download-page__download-icon" />
                 <span>Download full Code</span>
               </a>
             </div>
@@ -130,17 +225,19 @@ export default function DownloadPage() {
                     <div className="download-revision-card__content">
                       <h3 className="download-revision-card__title">{item.title}</h3>
                       <p className="download-revision-card__description">
-                        Effective {formatEffectiveDate(item.effectiveDate)}: {item.description}
+                        <strong>Effective {formatEffectiveDate(item.effectiveDate)}:</strong>{' '}
+                        {renderDescriptionWithLinks(item.description)}
                       </p>
                     </div>
                     <a
-                      className="download-page__button download-page__button--small"
+                      className="download-page__button download-page__button--small download-page__button--revision-pdf"
                       href={item.pdfLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Open ${item.title} PDF in a new tab`}
                     >
-                      PDF
+                      <Icon type="download" className="download-page__download-icon" />
+                      <span>PDF</span>
                     </a>
                   </li>
                 ))}

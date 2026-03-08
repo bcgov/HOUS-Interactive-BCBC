@@ -7,7 +7,7 @@
         {
           "year": 2024,
           "label": "BC Building Code 2024 (PDF)",
-          "pdfLink": "https://www.bccodes.ca/bc-building-code-2024.pdf"
+          "pdfLink": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/revisions-and-mo/bcbc_2024_web_version_revision2.pdf"
         }
       ],
       "revisionsErrata": [
@@ -15,36 +15,43 @@
           "type": "revision",
           "title": "Adaptable dwelling units, Part 9 seismic, and general updates",
           "effectiveDate": "2025-06-16",
-          "description": "Revision 6 includes updates to adaptable dwelling units, clarifies Part 9 seismic requirements, and introduces general updates.",
-          "pdfLink": "https://www.bccodes.ca/revisions/2024/revision-6.pdf"
+          "description": "Revision 6 changes include updates to make adaptable dwelling units easier to design and construct, offering greater flexibility that can reduce space requirements and costs beneficial to the project. The changes also clarify seismic requirements for houses and small buildings (Part 9) to support builder understanding and compliance. Additional general updates are also included.",
+          "pdfLink": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/revisions-and-mo/bcbc-revision-6/ministerial_order_ba_2025_02.pdf"
         },
         {
           "type": "revision",
           "title": "Adaptable dwelling units",
           "effectiveDate": "2025-03-10",
-          "description": "Revision 5 phases in adaptable dwelling unit requirements and accessibility updates.",
-          "pdfLink": "https://www.bccodes.ca/revisions/2024/revision-5.pdf"
+          "description": "Revision 5 phases in adaptable dwelling units. Read more about [accessibility requirements in this revision.](https://www2.gov.bc.ca/gov/content/industry/construction-industry/building-codes-standards/bc-codes/2024-bc-codes/accessibility#adaptable)",
+          "pdfLink": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/revisions-and-mo/bcbc-revision-5/mo_no_bc_2025_01_revision_5_signed_2025-03-03.pdf"
         },
         {
           "type": "revision",
           "title": "Zero Carbon Step Code",
           "effectiveDate": "2025-03-10",
           "description": "Revision 4 amends Zero Carbon Step Code to require new buildings to meet at least EL-1.",
-          "pdfLink": "https://www.bccodes.ca/revisions/2024/revision-4.pdf"
+          "pdfLink": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/revisions-and-mo/bcbc-revision-4/mo_-_bc_building_code_amendment_-_zero_carbon_step_code.pdf"
         },
         {
-          "type": "errata",
+          "type": "revision",
+          "title": "Construction of single exit stair buildings",
+          "effectiveDate": "2024-08-27",
+          "description": "Revision 3 enables the construction of single exit stair buildings. [BCBC Single Exit Stairs code change convenience copy (PDF, 164 KB)](https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/revisions-and-mo/bcbc-revision-3/bcbc_revision_3_single_exit_stair_convenience_copy_2024-08-28.pdf) provides Code language in force and commentary to support implementation. These updates will be consolidated into the BC Building Code 2024.",
+          "pdfLink": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/revisions-and-mo/bcbc-revision-3/2024_bcbc_mo_ba_2024_03.pdf"
+        },
+        {
+          "type": "revision",
           "title": "Definition of coordinating registered professional and minor corrections",
           "effectiveDate": "2024-05-24",
-          "description": "Amends coordinating registered professional wording and includes minor numbering and reference corrections.",
-          "pdfLink": "https://www.bccodes.ca/revisions/2024/revision-2.pdf"
+          "description": "Revision 2 amends definition of \"coordinating registered professional\" and minor corrections to numbering and a referenced standard.",
+          "pdfLink": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/revisions-and-mo/bcbc-revision-2/04_building_code_ministerial_order_67270mrk_signed_pdf.pdf"
         },
         {
           "type": "revision",
           "title": "Enabling taller mass timber buildings",
           "effectiveDate": "2024-04-05",
-          "description": "Revision 1 updates encapsulated mass timber construction provisions and related occupancy allowances.",
-          "pdfLink": "https://www.bccodes.ca/revisions/2024/revision-1.pdf"
+          "description": "Revision 1 amends provisions for encapsulated mass timber construction to allow taller mass timber building, additional building occupancies, and changes to encapsulation requirements. [BCBC EMTC code change convenience copy (PDF, 210 KB).](https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/revisions-and-mo/bcbc_emtc_code_change_convenience_copy.pdf) Provides Code language in force. These changes will be consolidated into the BC Building Code 2024.\nLearn more about [mass timber construction in B.C.](https://www2.gov.bc.ca/gov/content/industry/construction-industry/mass-timber)",
+          "pdfLink": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/revisions-and-mo/2024_bcbc_emtc_ministerial_order.pdf"
         }
       ],
       "about": {
