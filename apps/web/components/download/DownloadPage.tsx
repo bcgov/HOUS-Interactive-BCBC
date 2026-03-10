@@ -141,6 +141,21 @@ export default function DownloadPage() {
     [activeVersion, selectedCodePdf]
   );
 
+  const aboutSections = [
+    {
+      title: 'File Format',
+      body: activeVersion?.about.fileFormat,
+    },
+    {
+      title: 'Effective Dates',
+      body: activeVersion?.about.effectiveDates,
+    },
+    {
+      title: 'Copyright & Usage',
+      body: activeVersion?.about.copyright,
+    },
+  ];
+
   if (loading) {
     return <div className="download-page">Loading download options...</div>;
   }
@@ -251,14 +266,13 @@ export default function DownloadPage() {
             About Downloads
           </h2>
 
-          <h3 className="download-about__heading">File Format</h3>
-          <p>{activeVersion.about.fileFormat}</p>
-
-          <h3 className="download-about__heading">Effective Dates</h3>
-          <p>{activeVersion.about.effectiveDates}</p>
-
-          <h3 className="download-about__heading">Copyright &amp; Usage</h3>
-          <p>{activeVersion.about.copyright}</p>
+          {aboutSections.map((section, index) => (
+            <div key={section.title} className="download-about__section">
+              {index > 0 ? <div className="download-about__divider" aria-hidden="true" /> : null}
+              <h3 className="download-about__heading">{section.title}</h3>
+              <p>{section.body}</p>
+            </div>
+          ))}
         </aside>
       </div>
     </section>

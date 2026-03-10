@@ -120,15 +120,27 @@
   border: 1px solid var(--surface-color-border-default, #d9d9d9);
   border-radius: 8px;
   background: var(--surface-color-background-white, #fff);
-  padding: 1rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 0.8125rem;
+}
+
+.download-about__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8125rem;
+}
+
+.download-about__divider {
+  width: 100%;
+  height: 1px;
+  background: var(--surface-color-border-default, #d8d8d8);
 }
 
 .download-about__heading {
-  margin: 0.25rem 0 0;
-  font: var(--typography-bold-small-body);
+  margin: 0;
+  font: var(--typography-regular-h6);
   color: var(--typography-color-primary);
 }
 
