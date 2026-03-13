@@ -330,10 +330,11 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
   const fetchTargetAppendix = useCallback(
     async (referenceId: string): Promise<PartAppendix | null> => {
       const parsed = parseReferenceId(referenceId);
-      if (!parsed || parsed.kind !== 'part_appendix') return null;
+      if (!parsed || parsed.kind !== 'part_appendix' || !parsed.part) return null;
 
       try {
-        const appendix = await fetchAppendix(version, parsed.division, parsed.part);
+        const partNumber = parsed.part;
+        const appendix = await fetchAppendix(version, parsed.division, partNumber);
         return resolvePartAppendixForEffectiveDate(appendix as any, effectiveDate);
       } catch {
         return null;
@@ -432,7 +433,8 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
         };
       }
 
-      if (parsed.kind === 'part_appendix' && parsed.appnote) {
+      if (parsed.kind === 'part_appendix' && parsed.appnote && parsed.part) {
+        const partNumber = parsed.part;
         const appendix =
           (isPartAppendixLevel ? resolvedPartAppendix : null) ||
           (await fetchTargetAppendix(referenceId));
@@ -449,7 +451,7 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
 
         const appnoteTokenMatch = referenceId.match(/\.appnote([A-Za-z0-9]+)/i);
         const appnoteToken = appnoteTokenMatch?.[1] || parsed.appnote;
-        const notePrefix = `${parsed.division}.part${parsed.part}.appendix.appnote${appnoteToken}`;
+        const notePrefix = `${parsed.division}.part${partNumber}.appendix.appnote${appnoteToken}`;
         const note = appendix.application_notes?.find((item: ApplicationNote) => item.id.startsWith(notePrefix));
 
         if (!note) {
@@ -500,7 +502,7 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
         };
       }
 
-      if (parsed.kind !== 'section' || !parsed.section) {
+      if (parsed.kind !== 'section' || !parsed.part || !parsed.section) {
         return {
           referenceId,
           heading: referenceId,

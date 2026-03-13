@@ -86,19 +86,30 @@ const buildDivisionAppendixCacheKey = (version: string, division: string, letter
 const buildDivisionAppendixFetchPath = (version: string, division: string, letter: string): string =>
   `/data/${version}/content/${normalizeDivision(division)}/appendix-${letter.toLowerCase()}.json`;
 
+const isPartAppendixPayload = (
+  payload: PartAppendix | DivisionAppendix
+): payload is PartAppendix => payload.type === 'part_appendix';
+
+const isDivisionAppendixPayload = (
+  payload: PartAppendix | DivisionAppendix
+): payload is DivisionAppendix => payload.type === 'appendix';
+
 export const useAppendixStore = create<AppendixStoreState>((set, get) => ({
   cache: new Map<string, PartAppendix | DivisionAppendix>(),
 
   fetchAppendix: async (version: string, division: string, part: string): Promise<PartAppendix> => {
     const cacheKey = buildCacheKey(version, division, part);
     const cached = get().cache.get(cacheKey);
-    if (cached) {
+    if (cached && isPartAppendixPayload(cached)) {
       return cached;
     }
 
     const inflight = inflightRequests.get(cacheKey);
     if (inflight) {
-      return inflight;
+      const inflightPayload = await inflight;
+      if (isPartAppendixPayload(inflightPayload)) {
+        return inflightPayload;
+      }
     }
 
     const request = (async () => {
@@ -132,13 +143,16 @@ export const useAppendixStore = create<AppendixStoreState>((set, get) => ({
   ): Promise<DivisionAppendix> => {
     const cacheKey = buildDivisionAppendixCacheKey(version, division, letter);
     const cached = get().cache.get(cacheKey);
-    if (cached) {
-      return cached as DivisionAppendix;
+    if (cached && isDivisionAppendixPayload(cached)) {
+      return cached;
     }
 
     const inflight = inflightRequests.get(cacheKey);
     if (inflight) {
-      return inflight as Promise<DivisionAppendix>;
+      const inflightPayload = await inflight;
+      if (isDivisionAppendixPayload(inflightPayload)) {
+        return inflightPayload;
+      }
     }
 
     const request = (async () => {

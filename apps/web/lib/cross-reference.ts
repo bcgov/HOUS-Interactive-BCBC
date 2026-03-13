@@ -87,6 +87,7 @@ export function getNavigationSlug(referenceId: string): string[] | null {
   if (!parsed) return null;
 
   if (parsed.kind === 'part_appendix') {
+    if (!parsed.part) return null;
     return [parsed.division, parsed.part, 'appendix'];
   }
 
@@ -94,7 +95,7 @@ export function getNavigationSlug(referenceId: string): string[] | null {
     return parsed.appendixLetter ? [parsed.division, 'appendix', parsed.appendixLetter] : null;
   }
 
-  if (!parsed.section) return null;
+  if (!parsed.part || !parsed.section) return null;
 
   const base = [parsed.division, parsed.part, parsed.section];
 
@@ -118,6 +119,7 @@ export function getSectionFetchPath(version: string, referenceId: string): strin
   );
 
   if (parsed.kind === 'part_appendix') {
+    if (!parsed.part) return null;
     return `/data/${version}/content/${transformedDivision}/part-${parsed.part}/appendix.json`;
   }
 
@@ -126,7 +128,7 @@ export function getSectionFetchPath(version: string, referenceId: string): strin
     return `/data/${version}/content/${transformedDivision}/appendix-${parsed.appendixLetter.toLowerCase()}.json`;
   }
 
-  if (!parsed.section) return null;
+  if (!parsed.part || !parsed.section) return null;
 
   return `/data/${version}/content/${transformedDivision}/part-${parsed.part}/section-${parsed.section}.json`;
 }

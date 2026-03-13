@@ -482,16 +482,21 @@ function parsePartAppendixData(raw: RawPartAppendix): PartAppendix {
 }
 
 function parseDivisionAppendixArticleData(raw: RawDivisionAppendixArticle): DivisionAppendixArticle {
+  const parsedContent = raw.content?.reduce<Array<Table | Figure>>((acc, item) => {
+    if (item.type === 'table') {
+      acc.push(parseTableData(item));
+    } else if (item.type === 'figure') {
+      acc.push(parseFigureData(item));
+    }
+    return acc;
+  }, []);
+
   return {
     id: raw.id,
     type: 'appendix_article',
     title: raw.title,
     paragraphs: raw.paragraphs?.map(parseAppendixParagraph),
-    content: raw.content?.flatMap((item) => {
-      if (item.type === 'table') return [parseTableData(item)];
-      if (item.type === 'figure') return [parseFigureData(item)];
-      return [];
-    }),
+    content: parsedContent,
   };
 }
 
