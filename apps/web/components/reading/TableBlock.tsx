@@ -402,7 +402,7 @@ const getResolvedTableNumber = (table: TableWithRawSupport): string => {
   const formingPartTarget = formingPartEntries?.find((entry) => typeof entry?.target === 'string')?.target;
   const referenceFromTarget = formingPartTarget ? buildArticleReference(formingPartTarget) : null;
 
-  return referenceFromTarget || buildArticleReference(table.id) || table.id;
+  return referenceFromTarget || buildArticleReference(table.id) || '';
 };
 
 const formatFormingPartLabel = (reference: ParsedInternalReference): string | null => {
