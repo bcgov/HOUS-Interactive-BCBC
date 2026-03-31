@@ -45,5 +45,6 @@ For more information on the automated and manual deployment capabilities of this
 
 #### Automated test suites
 
-As part of the deployment it is highly recommended to run the automated test suites.  These are found in the folder [tests](tests) on this repo, and can be run by manually running github action E2E Tests. 
+There are a suite of end-to-end tests which are set to run on a merge to ```develop```.  These are found in the folder [tests](tests) on this repo. They can also be run by manually running github action ```E2E Tests```. 
+
 
