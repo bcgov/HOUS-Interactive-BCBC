@@ -1,6 +1,6 @@
 # Development environment values
-namespace: d6af69-dev
-replicaCount: 1
+namespace: d6af69-prod
+replicaCount: 2
 
 resources:
   limits:
@@ -12,7 +12,7 @@ resources:
 
 route:
   enabled: true
-  host: dev.buildingcode.gov.bc.ca
+  host: buildingcode.gov.bc.ca
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
