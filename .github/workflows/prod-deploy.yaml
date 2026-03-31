@@ -1,4 +1,4 @@
-name: Deploy to Dev
+name: Deploy to PROD
 
 permissions:
   contents: read
@@ -10,14 +10,14 @@ on:
         description: 'Image tag to deploy (e.g., PR number or commit SHA)'
         required: true
         default: 'latest'
-  push:
-    branches:
-      - develop
+  # push:
+  #   branches:
+  #     - develop
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: prod
     outputs:
       image-tag: ${{ steps.set-tag.outputs.tag }}
     steps:
@@ -62,7 +62,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    environment: dev
+    environment: prod
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -78,14 +78,15 @@ jobs:
         run: oc login --token=${{ secrets.OPENSHIFT_SERVICEACCOUNT_TOKEN }} --server=${{ secrets.OPENSHIFT_SERVER }}
 
       - name: Set OpenShift project
-        run: oc project ${{ vars.OPENSHIFT_NAMESPACE || 'd6af69-dev' }}
+        run: oc project ${{ vars.OPENSHIFT_NAMESPACE || 'd6af69-prod' }}
 
       - name: Deploy Application in OpenShift
         run: |
           helm upgrade --install interactive-bcbc-app . \
-            -f values-dev.yaml \
+            -f values.yaml \
+            -f values-prod.yaml \
             --set image.repository=${{ vars.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPOSITORY_NAME }}/interactive-bcbc-app \
             --set image.tag=${{ needs.build.outputs.image-tag }} \
             --set imagePullSecrets[0].name=${{ secrets.IMAGE_PULL_SECRET_NAME }} \
-            --namespace ${{ vars.OPENSHIFT_NAMESPACE || 'd6af69-dev' }}
+            --namespace ${{ vars.OPENSHIFT_NAMESPACE || 'd6af69-prod' }}
         working-directory: ./charts/interactive-bcbc-app
