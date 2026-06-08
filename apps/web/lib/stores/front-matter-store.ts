@@ -6,14 +6,32 @@
 
 import { create } from 'zustand';
 
+export interface FrontMatterRevision {
+  type?: 'original' | 'revision';
+  effective_date?: string;
+  revision_id?: string;
+  revision_type?: 'amendment' | 'add' | 'replace' | 'delete';
+  sequence?: number;
+  status?: string;
+  content?: string;
+  title?: string;
+  change_summary?: string;
+  note?: string;
+  deleted?: boolean;
+  [key: string]: any;
+}
+
 /**
  * Front matter content item (paragraph, heading, table, etc.)
  */
 export interface FrontMatterContentItem {
   type: 'paragraph' | 'heading' | 'table' | 'figure' | 'list';
   id: string;
+  deleted?: boolean;
+  revised?: boolean;
   content?: string;
   level?: number;  // For headings
+  revisions?: FrontMatterRevision[];
   [key: string]: any;  // Allow additional properties
 }
 
@@ -23,10 +41,13 @@ export interface FrontMatterContentItem {
 export interface FrontMatterSection {
   id: string;
   type: 'preface' | 'introduction' | 'committees';
+  deleted?: boolean;
+  revised?: boolean;
   title?: string;
   content?: FrontMatterContentItem[];
   tables?: any[];  // For committees section
   notes?: any[];   // For committees section
+  revisions?: FrontMatterRevision[];
 }
 
 interface FrontMatterState {

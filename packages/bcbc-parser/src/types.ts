@@ -69,8 +69,11 @@ export interface CommitteesContent {
 export interface FrontMatterContentItem {
   type: 'paragraph' | 'heading' | 'table' | 'figure' | 'list';
   id: string;
+  deleted?: boolean;
+  revised?: boolean;
   content?: string;
   level?: number;  // For headings
+  revisions?: Revision[];
   [key: string]: any;  // Allow additional properties
 }
 

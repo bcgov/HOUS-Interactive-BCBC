@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { resolvePartAppendixForEffectiveDate, resolveSectionForEffectiveDate } from './revision-resolver';
+import {
+  resolveFrontMatterSectionForEffectiveDate,
+  resolvePartAppendixForEffectiveDate,
+  resolveSectionForEffectiveDate,
+} from './revision-resolver';
 
 describe('resolveSectionForEffectiveDate', () => {
   it('selects the latest valid revision at subsection/article/sentence levels', () => {
@@ -356,5 +360,81 @@ describe('resolveSectionForEffectiveDate', () => {
     expect(content[1].type).toBe('list');
     expect(content[2].type).toBe('note_division');
     expect(content[3].type).toBe('table');
+  });
+
+  it('resolves front matter paragraph and table revisions by effective date', () => {
+    const frontMatter = {
+      id: 'nbc.2020.preface',
+      type: 'preface',
+      content: [
+        {
+          id: 'nbc.2020.preface.para1',
+          type: 'paragraph',
+          content: 'Current preface paragraph',
+          revised: true,
+          revisions: [
+            {
+              type: 'original',
+              effective_date: '2020-12-01',
+              content: 'Original preface paragraph',
+            },
+            {
+              type: 'revision',
+              effective_date: '2025-06-16',
+              content: 'Revised preface paragraph',
+            },
+          ],
+        },
+        {
+          id: 'nbc.2020.preface.table1',
+          type: 'table',
+          title: 'Current table title',
+          structure: { body_rows: [] },
+          revised: true,
+          revisions: [
+            {
+              type: 'original',
+              effective_date: '2020-12-01',
+              title: 'Original table title',
+            },
+            {
+              type: 'revision',
+              effective_date: '2025-06-16',
+              title: 'Revised table title',
+            },
+          ],
+        },
+      ],
+      notes: [
+        {
+          id: 'nbc.2020.preface.note1',
+          type: 'paragraph',
+          content: 'Current note',
+          revised: true,
+          revisions: [
+            {
+              type: 'original',
+              effective_date: '2020-12-01',
+              content: 'Original note',
+            },
+            {
+              type: 'revision',
+              effective_date: '2025-06-16',
+              content: 'Revised note',
+            },
+          ],
+        },
+      ],
+    } as any;
+
+    const original = resolveFrontMatterSectionForEffectiveDate(frontMatter, '2021-01-01');
+    expect(original.content?.[0].content).toBe('Original preface paragraph');
+    expect(original.content?.[1].title).toBe('Original table title');
+    expect(original.notes?.[0].content).toBe('Original note');
+
+    const revised = resolveFrontMatterSectionForEffectiveDate(frontMatter, '2025-06-16');
+    expect(revised.content?.[0].content).toBe('Revised preface paragraph');
+    expect(revised.content?.[1].title).toBe('Revised table title');
+    expect(revised.notes?.[0].content).toBe('Revised note');
   });
 });

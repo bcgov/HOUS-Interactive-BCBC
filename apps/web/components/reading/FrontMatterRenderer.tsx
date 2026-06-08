@@ -16,11 +16,13 @@ import './FrontMatterRenderer.css';
 interface FrontMatterRendererProps {
   section: FrontMatterSection;
   interactive?: boolean;
+  effectiveDate?: string;
 }
 
 export const FrontMatterRenderer: React.FC<FrontMatterRendererProps> = ({
   section,
   interactive = true,
+  effectiveDate,
 }) => {
   const renderContentItem = (item: FrontMatterContentItem): React.ReactNode => {
     switch (item.type) {
@@ -55,6 +57,7 @@ export const FrontMatterRenderer: React.FC<FrontMatterRendererProps> = ({
             key={item.id}
             table={item as any}
             interactive={interactive}
+            effectiveDate={effectiveDate}
           />
         );
 
@@ -114,13 +117,14 @@ export const FrontMatterRenderer: React.FC<FrontMatterRendererProps> = ({
             key={table.id || `table-${index}`}
             table={table}
             interactive={interactive}
+            effectiveDate={effectiveDate}
           />
         ))}
 
         {/* Render notes (for committees section) */}
         {section.notes?.map((note, index) => (
           <div key={note.id || `note-${index}`} className="front-matter__note">
-            {note.content && <p>{parseTextWithMarkers(note.content, [], interactive)}</p>}
+            {note.content && <p>{parseTextWithMarkers(note.content, [], interactive, note.equations || [], note.lists || [])}</p>}
           </div>
         ))}
       </div>

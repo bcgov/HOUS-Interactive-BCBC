@@ -1,4 +1,5 @@
 import type { Section } from '@bc-building-code/bcbc-parser';
+import type { FrontMatterContentItem, FrontMatterSection } from './stores/front-matter-store';
 
 type RevisionRecord = {
   effective_date?: string;
@@ -409,6 +410,43 @@ export function resolveSectionForEffectiveDate(
     ...(resolved as unknown as Section),
     number,
     subsections: subsections.items as any,
+  };
+}
+
+export function resolveFrontMatterSectionForEffectiveDate<T extends FrontMatterSection>(
+  section: T,
+  effectiveDate?: string
+): T {
+  const resolved = applyRevision(section as unknown as ContentNode, effectiveDate);
+  if (!resolved) return section;
+
+  const content = Array.isArray((resolved as FrontMatterSection).content)
+    ? mapResolvedArray((resolved as FrontMatterSection).content as FrontMatterContentItem[], (item) =>
+        resolveContentNode(item as unknown as ContentNode, effectiveDate) as FrontMatterContentItem | null
+      )
+    : { items: [], changed: false };
+
+  const tables = Array.isArray((resolved as FrontMatterSection).tables)
+    ? mapResolvedArray((resolved as FrontMatterSection).tables as ContentNode[], (table) =>
+        resolveTable(table, effectiveDate)
+      )
+    : { items: [], changed: false };
+
+  const notes = Array.isArray((resolved as FrontMatterSection).notes)
+    ? mapResolvedArray((resolved as FrontMatterSection).notes as FrontMatterContentItem[], (note) =>
+        applyRevision(note as unknown as ContentNode, effectiveDate) as FrontMatterContentItem | null
+      )
+    : { items: [], changed: false };
+
+  if (resolved === (section as unknown as ContentNode) && !content.changed && !tables.changed && !notes.changed) {
+    return resolved as T;
+  }
+
+  return {
+    ...(resolved as T),
+    ...(content.changed ? { content: content.items as FrontMatterContentItem[] } : {}),
+    ...(tables.changed ? { tables: tables.items } : {}),
+    ...(notes.changed ? { notes: notes.items as FrontMatterContentItem[] } : {}),
   };
 }
 

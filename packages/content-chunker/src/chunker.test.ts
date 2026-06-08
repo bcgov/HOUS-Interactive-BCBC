@@ -150,6 +150,45 @@ describe('chunkRawContent', () => {
     expect(tableNode.revisions).toHaveLength(1);
     expect(tableNode.revisions[0].effective_date).toBe('2020-12-01');
   });
+
+  it('preserves front matter paragraph revisions in raw chunks', () => {
+    const mockRawDocument = {
+      volumes: [
+        {
+          front_matter: {
+            id: 'front-matter',
+            preface: {
+              id: 'nbc.2020.preface',
+              type: 'preface',
+              content: [
+                {
+                  id: 'nbc.2020.preface.para1',
+                  type: 'paragraph',
+                  content: 'Current paragraph',
+                  revised: true,
+                  revisions: [
+                    {
+                      type: 'original',
+                      effective_date: '2020-12-01',
+                      content: 'Original paragraph',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          divisions: [],
+        },
+      ],
+    };
+
+    const chunks = chunkRawContent(mockRawDocument);
+
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0].path).toBe('content/front-matter/preface.json');
+    expect((chunks[0].data.content as any[])[0].revised).toBe(true);
+    expect((chunks[0].data.content as any[])[0].revisions[0].content).toBe('Original paragraph');
+  });
 });
 
 describe('generateChunkPath', () => {

@@ -36,7 +36,11 @@ import { useNavigationStore, NavigationNode } from '../../stores/navigation-stor
 import { useEquationStore } from '../../stores/equation-store';
 import { useStandardsMapStore, type StandardReferenceEntry } from '../../stores/standards-map-store';
 import { parseContentPath } from '../../lib/url-utils';
-import { resolvePartAppendixForEffectiveDate, resolveSectionForEffectiveDate } from '../../lib/revision-resolver';
+import {
+  resolveFrontMatterSectionForEffectiveDate,
+  resolvePartAppendixForEffectiveDate,
+  resolveSectionForEffectiveDate,
+} from '../../lib/revision-resolver';
 import {
   getNavigationSlug,
   getSectionFetchPath,
@@ -265,6 +269,10 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
   const resolvedSection = useMemo(
     () => (currentSection ? resolveSectionForEffectiveDate(currentSection, effectiveDate) : null),
     [currentSection, effectiveDate]
+  );
+  const resolvedFrontMatter = useMemo(
+    () => (currentFrontMatter ? resolveFrontMatterSectionForEffectiveDate(currentFrontMatter, effectiveDate) : null),
+    [currentFrontMatter, effectiveDate]
   );
   const resolvedPartAppendix = useMemo(
     () => (partAppendix ? resolvePartAppendixForEffectiveDate(partAppendix as any, effectiveDate) : null),
@@ -1877,11 +1885,11 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
     }
 
     // No content state
-    if (!currentFrontMatter) {
+    if (!resolvedFrontMatter) {
       return renderLoadingSkeleton();
     }
 
-    const sectionTitle = currentFrontMatter.title || slug[1];
+    const sectionTitle = resolvedFrontMatter.title || slug[1];
     const pdfLabel = `Preface - ${sectionTitle} PDF`;
 
     return (
@@ -1893,8 +1901,9 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
 
           <div className="reading-view__content">
             <FrontMatterRenderer
-              section={currentFrontMatter}
+              section={resolvedFrontMatter}
               interactive={true}
+              effectiveDate={effectiveDate}
             />
           </div>
           <PrintFooter />
