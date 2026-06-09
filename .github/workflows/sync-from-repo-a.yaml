@@ -28,7 +28,8 @@ jobs:
         run: |
           if [[ "${{ github.event.client_payload.branch }}" != "develop" ]] || \
              [[ "${{ github.event.client_payload.source_repo }}" != "bcgov/BC-Building-Code" ]] || \
-             [[ "${{ github.event.client_payload.workflow }}" != "Generate BC Building Code Artifact" ]]; then
+             # [[ "${{ github.event.client_payload.workflow }}" != "Generate BC Building Code Artifact" ]]; then
+             [[ "${{ github.event.client_payload.workflow }}" != "feature/update_sync_repo_trigger" ]]; then
             echo "valid=false" >> $GITHUB_OUTPUT
             echo "Payload does not match expected values. Skipping..."
           else
