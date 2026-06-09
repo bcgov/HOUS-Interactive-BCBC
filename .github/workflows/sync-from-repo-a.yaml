@@ -5,18 +5,36 @@ on:
     types: [sync-from-repo-a]
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
   sync:
-    if: >
-      github.event.client_payload.branch == 'develop' &&
-      github.event.client_payload.source_repo == 'bcgov/BC-Building-Code' &&
-      github.event.client_payload.workflow == 'Generate BC Building Code Artifact'
+  #   if: >
+  #     github.event.client_payload.branch == 'develop' &&
+  #     github.event.client_payload.source_repo == 'bcgov/BC-Building-Code' &&
+  #     github.event.client_payload.workflow == 'Generate BC Building Code Artifact'
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug payload
+        run: |
+          echo "Branch: ${{ github.event.client_payload.branch }}"
+          echo "Repo: ${{ github.event.client_payload.source_repo }}"
+          echo "Workflow: ${{ github.event.client_payload.workflow }}"
+
+      - name: Validate payload
+        id: validate
+        run: |
+          if [[ "${{ github.event.client_payload.branch }}" != "develop" ]] || \
+             [[ "${{ github.event.client_payload.source_repo }}" != "bcgov/BC-Building-Code" ]] || \
+             [[ "${{ github.event.client_payload.workflow }}" != "Generate BC Building Code Artifact" ]]; then
+            echo "valid=false" >> $GITHUB_OUTPUT
+            echo "Payload does not match expected values. Skipping..."
+          else
+            echo "valid=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout destination repo branch
         uses: actions/checkout@v4
         with:
