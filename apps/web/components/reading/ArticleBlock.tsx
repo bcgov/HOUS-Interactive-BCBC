@@ -14,7 +14,12 @@ import { formatNumberedTitle } from '../../lib/title-formatting';
 import './ArticleBlock.css';
 
 type RawFormingPartEntry = { type: string; target: string };
-type RawTableItem = { id?: string; forming_part?: RawFormingPartEntry[]; formingPart?: RawFormingPartEntry[] };
+type RawTableItem = {
+  id?: string;
+  number?: string | number;
+  forming_part?: RawFormingPartEntry[];
+  formingPart?: RawFormingPartEntry[];
+};
 
 function extractArticleRef(id: string): string | null {
   const part = id.match(/\.part(\d+)/i)?.[1];
@@ -59,6 +64,8 @@ function computeTableNumbers(articleContent: unknown[]): Map<string, string> {
 
   infos.forEach((info, idx) => {
     if (!info.articleRef) return;
+    // The pipeline writes the number printed in the PDF (e.g. 4.1.6.2.-B); never override it with a guess.
+    if (String(tables[idx].number ?? '').trim() !== '') return;
     if (useSentenceSuffix) {
       map.set(info.id, `${info.articleRef}.(${info.sentences[0]})`);
     } else {

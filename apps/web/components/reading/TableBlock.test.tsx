@@ -676,7 +676,7 @@ describe('TableBlock', () => {
 
     render(<TableBlock table={table} />);
 
-    expect(screen.getByText('Table D-1.1.2-A.')).toBeInTheDocument();
+    expect(screen.getByText('Table D-1.1.2.-A')).toBeInTheDocument();
   });
 
   it('renders top-level appendix table numbering and forming part labels', () => {
@@ -1242,5 +1242,20 @@ describe('TableBlock', () => {
 
     // Letter-suffix format: dot before letter, no trailing dot
     expect(screen.getByText('Table 3.3.1.5.-A')).toBeInTheDocument();
+  });
+
+  it('prints a Note table number with a letter suffix without a trailing period', () => {
+    const table = {
+      id: 'nbc.divBV2.part9.appendix.appnote223.div2.table1',
+      type: 'table' as const,
+      number: 'A-9.36.2.4.(1)-A',
+      title: 'Framing and Cavity Percentages',
+      headers: [['Col']],
+      rows: [{ cells: [{ content: 'Data' }] }],
+    };
+
+    render(<TableBlock table={table as unknown as Table} />);
+
+    expect(screen.getByText('Table A-9.36.2.4.(1)-A')).toBeInTheDocument();
   });
 });

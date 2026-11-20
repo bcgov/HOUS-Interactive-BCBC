@@ -71,6 +71,18 @@ function extractFigureNumberFromId(id: string): string | undefined {
   return `${part}.${section}.${subsection}.${article}.-${toAlphabetOrdinalUpper(figureIndex)}`;
 }
 
+// The pipeline writes numbers without the final period ("4.1.6.11", "A-9.10.3.1.-C").
+// Add it as the PDF prints it, except after ")" or a letter suffix ("-A") and for "C-1".
+function getFigureNumberDisplay(figureNumber: string): string {
+  const normalized = figureNumber.trim();
+  const omitTrailingDot =
+    normalized.endsWith('.') ||
+    normalized.endsWith(')') ||
+    /^[A-Za-z]-\d+$/.test(normalized) ||
+    /-[A-Z]$/.test(normalized);
+  return omitTrailingDot ? normalized : `${normalized}.`;
+}
+
 function getFigureNoteNumber(noteId: string): string {
   const noteMatch = noteId.match(/\.note(\d+)$/i);
   return noteMatch?.[1] || noteId.split('.').pop() || noteId;
@@ -214,8 +226,9 @@ export const FigureBlock: React.FC<FigureBlockProps> = ({
   const rawImageSrc = figure.imageUrl || figure.graphic?.src;
   const imagePath = resolveImagePath(rawImageSrc);
   const altText = figure.altText || figure.graphic?.alt_text || figure.title || 'Figure';
-  const figureNumber = extractFigureNumberFromId(figure.id) || figure.number;
-  const figureLabel = figureNumber ? `Figure ${figureNumber}` : 'Figure';
+  // Prefer the number the pipeline writes (as printed in the PDF); the id-based guess is a fallback.
+  const figureNumber = String(figure.number ?? '').trim() || extractFigureNumberFromId(figure.id);
+  const figureLabel = figureNumber ? `Figure ${getFigureNumberDisplay(figureNumber)}` : 'Figure';
   const hideLabel = figure.hide_label === true;
   const formingPartEntries = figure.formingPart ?? figure.forming_part;
   const formingPartText = formatFormingPartText(formingPartEntries);

@@ -554,7 +554,8 @@ const getResolvedTableNumber = (table: TableWithRawSupport, siblingTableCount?: 
       }
       const tableIndex = parseInt(parsedFromId.table, 10);
       const tableLetter = toAlphabetOrdinal(tableIndex).toUpperCase();
-      return `${baseNumber}-${tableLetter}`;
+      // The PDF prints Appendix D letters after the Article period: Table D-2.6.1.-A
+      return `${baseNumber}.-${tableLetter}`;
     }
 
     return `${parsedFromId.appendixLetter}-${parsedFromId.table}`;
@@ -577,7 +578,8 @@ const getResolvedTableNumber = (table: TableWithRawSupport, siblingTableCount?: 
     }
     const tableIndex = parseInt(parsedFromId.table, 10);
     const tableLetter = toAlphabetOrdinal(tableIndex).toUpperCase();
-    return `${baseNumber}-${tableLetter}`;
+    // The PDF prints Appendix D letters after the Article period: Table D-2.6.1.-A
+    return `${baseNumber}.-${tableLetter}`;
   }
 
   const formingPartEntries = table.formingPart ?? table.forming_part;
@@ -703,7 +705,7 @@ const getTableNumberDisplay = (tableNumber: string): string => {
   const omitTrailingDot =
     normalized.endsWith(')') ||
     /^[A-Za-z]-\d+$/i.test(normalized) ||
-    /\.-[A-Z]$/i.test(normalized); // letter suffix e.g. 3.2.3.1.-A
+    /-[A-Z]$/.test(normalized); // letter suffix e.g. 3.2.3.1.-A, A-9.36.2.4.(1)-A
 
   return `Table ${normalized}${omitTrailingDot ? '' : '.'}`;
 };

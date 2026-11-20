@@ -39,6 +39,18 @@ describe('FigureBlock', () => {
       // nbc.divC.part2.sect3.subsect1.art2.figure1 → "Figure 2.3.1.2.-A"
       expect(container.querySelector('.figure-block__number')?.textContent).toBe('Figure 2.3.1.2.-A');
     });
+
+    it('prefers the number from the data over the id-based guess', () => {
+      const figure = { ...baseFigure, id: 'nbc.divB.part4.sect1.subsect6.art11.figure1', number: '4.1.6.11' };
+      const { container } = render(<FigureBlock figure={figure} />);
+      expect(container.querySelector('.figure-block__number')?.textContent).toBe('Figure 4.1.6.11.');
+    });
+
+    it('prints Note figure numbers with a letter suffix as given', () => {
+      const figure = { ...baseFigure, id: 'nbc.divBV2.part9.appendix.appnote57.figure3', number: 'A-9.10.3.1.-C' };
+      const { container } = render(<FigureBlock figure={figure} />);
+      expect(container.querySelector('.figure-block__number')?.textContent).toBe('Figure A-9.10.3.1.-C');
+    });
   });
 
   describe('image rendering', () => {
