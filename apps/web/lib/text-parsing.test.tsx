@@ -738,6 +738,30 @@ describe('parseTextWithMarkers - objective-based code references', () => {
     expect(objectiveRefs[0].props.objectiveId).toBe('nbc-obj-os1.5');
   });
 
+  it('prints functional statement and objective references as in the PDF: [F20,F21-OS2.1,OS2.3]', () => {
+    const input =
+      '[ [REF:functional-statement:fs20] , [REF:functional-statement:fs21] - [REF:sub-objective:nbc-obj-os2.1] , [REF:sub-objective:nbc-obj-os2.3] ]';
+    const { container } = render(<>{parseTextWithMarkers(input, [], false)}</>);
+
+    expect(container.textContent).toBe('[F20,F21-OS2.1,OS2.3]');
+  });
+
+  it('keeps the brackets around a single functional statement: [F12]', () => {
+    const { container } = render(<>{parseTextWithMarkers('[[REF:functional-statement:fs12]]', [], false)}</>);
+
+    expect(container.textContent).toBe('[F12]');
+  });
+
+  it('renders a table-note mark as superscript right after its word', () => {
+    const input = 'Grade[REF:table-note:nbc.divB.part3.sect2.subsect3.art7.table1.note1]';
+    const { container } = render(<>{parseTextWithMarkers(input, [], false)}</>);
+
+    const sup = container.querySelector('sup.table-note-mark');
+    expect(sup).not.toBeNull();
+    expect(sup?.textContent).toBe('(1)');
+    expect(container.textContent).toBe('Grade(1)');
+  });
+
   it('parses multiline spaced double-bracket references', () => {
     const input = '[ [REF:functional-statement:fs20] ,\n[REF:functional-statement:fs21] - [REF:sub-objective:nbc-obj-op2.3] ]';
     const nodes = parseTextWithMarkers(input, [], true);

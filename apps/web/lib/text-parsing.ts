@@ -1326,33 +1326,14 @@ export function parseTextWithMarkers(
     }
 
     if (compoundParts.length > 0) {
-      if (compoundParts.length === 1) {
-        // Single reference
-        const part = compoundParts[0];
-        if (part.type === 'functionalStatement') {
-          markers.push({
-            type: 'functionalStatement',
-            start: matchStart,
-            end: matchEnd,
-            functionalStatementId: part.id,
-          });
-        } else {
-          markers.push({
-            type: 'objective',
-            start: matchStart,
-            end: matchEnd,
-            objectiveId: part.id,
-          });
-        }
-      } else {
-        // Compound reference
-        markers.push({
-          type: 'compound',
-          start: matchStart,
-          end: matchEnd,
-          compoundParts,
-        });
-      }
+      // Always a compound marker, also for a single part: the PDF prints the brackets
+      // around every attribution, e.g. [F12] or [F03-OS1.2].
+      markers.push({
+        type: 'compound',
+        start: matchStart,
+        end: matchEnd,
+        compoundParts,
+      });
     }
   }
 
@@ -1567,13 +1548,17 @@ export function parseTextWithMarkers(
       }
 
       case 'tableNote': {
+        // The PDF prints table-note marks as superscript: "Grade⁽¹⁾", "100⁽¹⁾".
         nodes.push(
-          React.createElement(CrossReferenceLink, {
-            key: `table-note-${marker.start}`,
-            referenceId: marker.tableNoteId!,
-            displayText: getNoteLabel(marker.tableNoteId!),
-            interactive,
-          })
+          React.createElement(
+            'sup',
+            { key: `table-note-${marker.start}`, className: 'table-note-mark' },
+            React.createElement(CrossReferenceLink, {
+              referenceId: marker.tableNoteId!,
+              displayText: getNoteLabel(marker.tableNoteId!),
+              interactive,
+            })
+          )
         );
         lastIndex = skipWhitespaceBeforePunctuation(sanitizedText, marker.end);
         break;
@@ -1713,9 +1698,10 @@ export function parseTextWithMarkers(
       }
 
       case 'compound': {
-        // Render compound references with square brackets: [ F03 - OS1.2 ]
+        // Render as printed in the PDF: [F03-OS1.2], [F20,F21-OS2.1,OS2.3].
+        // The brackets are real text (not CSS), so they are copied and searched with the rest.
         const parts = marker.compoundParts || [];
-        const displayParts: React.ReactNode[] = [];
+        const displayParts: React.ReactNode[] = ['['];
 
         for (let i = 0; i < parts.length; i++) {
           const part = parts[i];
@@ -1749,10 +1735,11 @@ export function parseTextWithMarkers(
           if (!isLast) {
             // Determine separator based on next part type
             const nextPart = parts[i + 1];
-            const separator = nextPart.type === part.type ? ', ' : ' - ';
+            const separator = nextPart.type === part.type ? ',' : '-';
             displayParts.push(separator);
           }
         }
+        displayParts.push(']');
 
         nodes.push(
           React.createElement('span', {

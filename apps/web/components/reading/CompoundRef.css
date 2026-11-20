@@ -2,7 +2,8 @@
  * Compound reference styling
  * 
  * Styles for compound references that contain multiple functional statements
- * and/or objectives (e.g., "[ F03 - OS1.2 ]" or "[ F02, F03 - OS1.2 ]")
+ * and/or objectives (e.g., "[F03-OS1.2]" or "[F02,F03-OS1.2]", as in the PDF).
+ * The brackets and separators are rendered as text in text-parsing.ts.
  * 
  * Matches the visual style of the printed BC Building Code tables with
  * square brackets and proper spacing.
@@ -11,14 +12,6 @@
 .compound-ref {
   display: inline-block;
   white-space: nowrap;
-}
-
-.compound-ref::before {
-  content: '[ ';
-}
-
-.compound-ref::after {
-  content: ' ]';
 }
 
 .compound-ref > * {
