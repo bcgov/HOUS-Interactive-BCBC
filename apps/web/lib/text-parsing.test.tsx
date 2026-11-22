@@ -111,6 +111,24 @@ describe('parseTextWithMarkers - objective-based code references', () => {
     expect(crossRefs[0].props.displayText).toBe('4.1.6.10');
   });
 
+  it('labels shortNum subclause references with their clause letter, as the attribution tables print them', () => {
+    const input =
+      '[REF:internal:nbc.divBV2.part9.sect27.subsect3.art8.sent1.clause2:shortNum] , ' +
+      '[REF:internal:nbc.divBV2.part9.sect27.subsect3.art8.sent1.clause3.subclause1:shortNum]';
+    const nodes = parseTextWithMarkers(input, [], true);
+    const crossRefs = getElementsByType(nodes, CrossReferenceLink);
+
+    expect(crossRefs.map((ref) => ref.props.displayText)).toEqual(['(b)', '(c)(i)']);
+  });
+
+  it('keeps the plain roman numeral for short subclause references', () => {
+    const input = '[REF:internal:nbc.divB.part3.sect8.subsect3.art12.sent1.clause4.subclause1:short]';
+    const nodes = parseTextWithMarkers(input, [], true);
+    const crossRefs = getElementsByType(nodes, CrossReferenceLink);
+
+    expect(crossRefs[0].props.displayText).not.toContain('(d)');
+  });
+
   it('formats internal table references using parent article numbering for long format', () => {
     const input = '[REF:internal:nbc.divB.part9.sect3.subsect1.art7.table1:long]';
     const nodes = parseTextWithMarkers(input, [], true);

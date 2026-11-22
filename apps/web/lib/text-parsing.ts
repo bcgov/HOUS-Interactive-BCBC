@@ -823,7 +823,13 @@ function formatInternalReference(referenceId: string, format?: InternalRefFormat
 
   if (subclause) {
     const number = toRoman(asNumber(subclause) ?? Number.NaN);
-    return isShortNumeric ? `(${number})` : withDivisionSuffix(`Subclause (${number})`);
+    if (isShortNumeric) {
+      // The short label is relative to the Sentence, as the attribution tables print it:
+      // clause3.subclause1 -> "(c)(i)", not "(i)" (Tables 3.10.1.1 and 9.38.1.1).
+      const clauseLetter = clause ? toAlphabetOrdinal(asNumber(clause) ?? Number.NaN) : '';
+      return clauseLetter ? `(${clauseLetter})(${number})` : `(${number})`;
+    }
+    return withDivisionSuffix(`Subclause (${number})`);
   }
 
   if (clause) {
