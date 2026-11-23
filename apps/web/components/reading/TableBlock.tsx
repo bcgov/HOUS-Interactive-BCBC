@@ -138,11 +138,10 @@ const renderFormattedText = (
     // Legacy placeholders used in some table content
     .replace(/<>/g, '<italic>')
     .replace(/<\/>/g, '</italic>')
-    // Normalize dash markers used in tables and common mojibake variants.
-    .replace(/â€”/g, '-')
-    .replace(/â€“/g, '-')
-    .replace(/—/g, '-')
-    .replace(/–/g, '-');
+    // Repair mojibake dashes. Real dashes stay as they are: the PDF prints "—" in an
+    // empty-value cell and "–" in headers such as "Equipment and Systems – Maximum…".
+    .replace(/â€”/g, '—')
+    .replace(/â€“/g, '–');
 
   const tokenRegex = /(<italic>[\s\S]*?<\/italic>|<bold>[\s\S]*?<\/bold>|\^\{[\s\S]*?\}|_\{[\s\S]*?\})/gi;
   const nodes: React.ReactNode[] = [];

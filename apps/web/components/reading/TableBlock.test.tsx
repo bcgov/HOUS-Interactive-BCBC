@@ -725,7 +725,7 @@ describe('TableBlock', () => {
     expect(screen.getByText('Data')).toBeInTheDocument();
   });
 
-  it('normalizes em dash table values to hyphen', () => {
+  it('keeps an em dash in a table cell, as the PDF prints it', () => {
     const table: Table = {
       id: 'test-table-dash',
       type: 'table',
@@ -741,7 +741,28 @@ describe('TableBlock', () => {
 
     render(<TableBlock table={table} />);
 
-    expect(screen.getByText('-')).toBeInTheDocument();
+    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.queryByText('-')).toBeNull();
+  });
+
+  it('keeps an en dash in table text and repairs a mojibake dash', () => {
+    const table: Table = {
+      id: 'test-table-en-dash',
+      type: 'table',
+      number: '10.2.3.3.-A',
+      title: 'Dash Header',
+      headers: [['Header']],
+      rows: [
+        { cells: [{ content: [{ type: 'text', value: 'Equipment and Systems – Maximum Total Energy Use Intensity' }] }] },
+        { cells: [{ content: [{ type: 'text', value: 'a â€“ b' }] }] },
+      ],
+    };
+
+    const { container } = render(<TableBlock table={table} />);
+
+    expect(container.textContent).toContain('Equipment and Systems – Maximum Total Energy Use Intensity');
+    expect(container.textContent).toContain('a – b');
+    expect(container.textContent).not.toContain('Systems - Maximum');
   });
 
   it('applies explicit colspan in raw table structure', () => {
