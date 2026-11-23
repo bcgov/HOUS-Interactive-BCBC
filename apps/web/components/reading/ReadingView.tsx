@@ -1371,6 +1371,11 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
 
     let tableIndex = 0;
     let figureIndex = 0;
+    // The PDF numbers only titled tables and figures; an untitled example table in a Note
+    // (A-9.36.2.4.(1) worked examples) prints no number, and the pipeline sends `number`
+    // for every titled one.
+    const hasTitle = (item: { title?: unknown; caption?: unknown }) =>
+      Boolean(String(item.title ?? item.caption ?? '').trim());
 
     const appendBlockNumbers = (block: AppendixContentBlock | undefined) => {
       if (!block) return;
@@ -1379,13 +1384,13 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
         for (const item of block.content) {
           if (!item || typeof item !== 'object' || !('type' in item)) continue;
           if (item.type === 'table') {
-            if (!item.id || item.number) continue;
+            if (!item.id || item.number || !hasTitle(item)) continue;
             tableIndex += 1;
             tableNumberById.set(item.id, `${noteNumber}-${toAlphabetOrdinalUpper(tableIndex)}`);
             continue;
           }
           if (item.type === 'figure') {
-            if (!item.id || item.number) continue;
+            if (!item.id || item.number || !hasTitle(item)) continue;
             figureIndex += 1;
             figureNumberById.set(item.id, `${noteNumber}-${toAlphabetOrdinalUpper(figureIndex)}`);
             continue;
@@ -1397,13 +1402,13 @@ export const ReadingView: React.FC<ReadingViewProps> = ({
       }
 
       for (const table of block.tables || []) {
-        if (!table?.id || table.number) continue;
+        if (!table?.id || table.number || !hasTitle(table)) continue;
         tableIndex += 1;
         tableNumberById.set(table.id, `${noteNumber}-${toAlphabetOrdinalUpper(tableIndex)}`);
       }
 
       for (const figure of block.figures || []) {
-        if (!figure?.id || figure.number) continue;
+        if (!figure?.id || figure.number || !hasTitle(figure)) continue;
         figureIndex += 1;
         figureNumberById.set(figure.id, `${noteNumber}-${toAlphabetOrdinalUpper(figureIndex)}`);
       }
