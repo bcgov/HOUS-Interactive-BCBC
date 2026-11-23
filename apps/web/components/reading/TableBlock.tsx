@@ -641,17 +641,21 @@ const formatFormingPartLabel = (reference: ParsedInternalReference): string | nu
     .filter(Boolean)
     .join('.');
 
+  // The PDF names the whole path: "Subclause 9.36.5.15.(6)(b)(i)", "Clause 4.1.7.13.(3)(b)".
+  const sentencePart = reference.sentence ? `(${reference.sentence})` : '';
+  const clausePart = reference.clause ? `(${toAlphabetOrdinal(Number(reference.clause))})` : '';
+
   if (reference.subclause) {
+    const subclausePart = `(${toRoman(Number(reference.subclause))})`;
     return articleReference
-      ? `Subclause ${articleReference}.(${toRoman(Number(reference.subclause))})`
-      : `Subclause (${toRoman(Number(reference.subclause))})`;
+      ? `Subclause ${articleReference}.${sentencePart}${clausePart}${subclausePart}`
+      : `Subclause ${sentencePart}${clausePart}${subclausePart}`;
   }
 
   if (reference.clause) {
-    const clauseLabel = toAlphabetOrdinal(Number(reference.clause));
     return articleReference
-      ? `Clause ${articleReference}.(${clauseLabel})`
-      : `Clause (${clauseLabel})`;
+      ? `Clause ${articleReference}.${sentencePart}${clausePart}`
+      : `Clause ${sentencePart}${clausePart}`;
   }
 
   if (reference.sentence) {
@@ -674,7 +678,9 @@ const formatFormingPartText = (formingPart: FormingPartReference[] | undefined):
 
   const labels = formingPart
     .filter((entry) => entry?.type === 'internal' && typeof entry.target === 'string')
-    .map((entry) => formatFormingPartLabel(parseInternalReference(entry.target)))
+    // A label from the data wins ("Note A-3.2.6.6.(1)": a Note cannot be named from its id).
+    .map((entry) => entry.text?.trim()
+      || formatFormingPartLabel(parseInternalReference(entry.target)))
     .filter((label): label is string => Boolean(label));
 
   if (labels.length === 0) {

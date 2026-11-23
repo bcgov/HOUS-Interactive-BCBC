@@ -503,6 +503,8 @@ export interface FormingPartReference {
   type: string;
   target: string;
   display_type?: string;
+  /** Label written by the pipeline, e.g. "Note A-3.2.6.6.(1)". */
+  text?: string;
 }
 
 /**

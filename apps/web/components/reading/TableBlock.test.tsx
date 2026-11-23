@@ -1244,3 +1244,21 @@ describe('TableBlock', () => {
     expect(screen.getByText('Table 3.3.1.5.-A')).toBeInTheDocument();
   });
 });
+
+describe('TableBlock "Forming Part of" line', () => {
+  const base = { type: 'table', title: 'T', headers: [['H']], rows: [{ cells: [{ content: [{ type: 'text', value: 'x' }] }] }] };
+
+  it('names a Subclause with its Sentence and Clause, as the PDF does', () => {
+    const table = { ...base, id: 'nbc.divBV2.part9.sect36.subsect5.art15.table1', number: '9.36.5.15.-A',
+      forming_part: [{ type: 'internal', target: 'nbc.divBV2.part9.sect36.subsect5.art15.sent6.clause2.subclause1', display_type: 'long' }] } as any;
+    const { container } = render(<TableBlock table={table} />);
+    expect(container.querySelector('.table-block__forming-part')?.textContent).toBe('Forming Part of Subclause 9.36.5.15.(6)(b)(i)');
+  });
+
+  it('uses the label from the data for a Note', () => {
+    const table = { ...base, id: 'nbc.divB.part3.appendix.appnote107.table2', number: 'A-3.2.6.6.(1)-B',
+      forming_part: [{ type: 'internal', target: 'nbc.divB.part3.appendix.appnote107', display_type: 'long', text: 'Note A-3.2.6.6.(1)' }] } as any;
+    const { container } = render(<TableBlock table={table} />);
+    expect(container.querySelector('.table-block__forming-part')?.textContent).toBe('Forming Part of Note A-3.2.6.6.(1)');
+  });
+});
