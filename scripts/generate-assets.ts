@@ -426,7 +426,10 @@ async function generateSpectablesMap(rawData: any, outputDir: string): Promise<v
             if (!table?.id) continue;
             spectablesMap[table.id] = {
               number: table.number,
-              title: table.title,
+              // A table-note mark in the title ("Walls(1)") is not part of the name.
+              title: typeof table.title === 'string'
+                ? table.title.replace(/\s*\[REF:table-note:[^\]]+\]/g, '')
+                : table.title,
               path,
             };
           }

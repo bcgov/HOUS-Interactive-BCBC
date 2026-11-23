@@ -492,7 +492,7 @@ function processPart(
             subsectionNumber: 0,
             subsectionTitle: '',
             path: `Division ${division.letter} > Part ${part.number} > ${spectableGroup.title || 'Special Tables'} > Table ${table.number}`,
-            breadcrumbs: [division.title, part.title, spectableGroup.title || 'Special Tables', title],
+            breadcrumbs: [division.title, part.title, spectableGroup.title || 'Special Tables', stripReferences(title, config.references)],
             urlPath: `/code/${division.id}/${part.number}/spectables/${spectableGroup.id}#${table.id}`,
             hasAmendment: false,
             hasInternalRefs: false,
