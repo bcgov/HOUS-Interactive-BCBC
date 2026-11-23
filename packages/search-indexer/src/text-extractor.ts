@@ -397,7 +397,11 @@ export function stripReferences(
     return text;
   }
 
-  return text.replace(REFERENCE_PATTERN, (match, type, payload, offset, sourceText) => {
+  // A table-note mark ([REF:table-note:<id>], shown as "(1)") carries no searchable words;
+  // REFERENCE_PATTERN (\w+ type) never matched it, so it reached titles and snippets raw.
+  const withoutTableNoteMarks = text.replace(/\s*\[REF:table-note:[^\]]+\]/g, '');
+
+  return withoutTableNoteMarks.replace(REFERENCE_PATTERN, (match, type, payload, offset, sourceText) => {
     // Only process configured reference types
     if (!config.processTypes.includes(type as ReferenceType)) {
       return match;

@@ -850,3 +850,16 @@ describe('extractArticleText strips formatting markers', () => {
     expect(text).toContain('600 m2 in area');
   });
 });
+
+
+describe('stripReferences: table-note marks', () => {
+  it('drops a table-note mark from a table title and from cell text', () => {
+    const config = { stripFromSearchText: true, processTypes: ['term', 'internal', 'external', 'standard'] } as any;
+    expect(
+      stripReferences('Importance Categories for Buildings[REF:table-note:nbc.divB.part4.sect1.subsect2.art1.table1.note1]', config)
+    ).toBe('Importance Categories for Buildings');
+    expect(
+      stripReferences('Document Number [REF:table-note:nbc.divB.part1.sect3.subsect1.art2.table1.note3] Title', config)
+    ).toBe('Document Number Title');
+  });
+});
