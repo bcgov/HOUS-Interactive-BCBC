@@ -18,6 +18,13 @@
   line-height: 34px;
 }
 
+.subsectionSeeAlso {
+  margin: -4px 0 16px 0;
+  font-family: var(--typography-font-families-bc-sans, 'BC Sans', sans-serif);
+  font-size: var(--typography-font-size-body, 1rem);
+  line-height: var(--typography-line-heights-normal, 1.5);
+}
+
 .articles {
   display: flex;
   flex-direction: column;

@@ -9,3 +9,10 @@
   margin-top: 1rem;
   min-width: 0;
 }
+
+.sectionSeeAlso {
+  margin: -8px 0 20px 0;
+  font-family: var(--typography-font-families-bc-sans, 'BC Sans', sans-serif);
+  font-size: var(--typography-font-size-body, 1rem);
+  line-height: var(--typography-line-heights-normal, 1.5);
+}
