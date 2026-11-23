@@ -829,6 +829,15 @@ function formatInternalReference(referenceId: string, format?: InternalRefFormat
       const clauseLetter = clause ? toAlphabetOrdinal(asNumber(clause) ?? Number.NaN) : '';
       return clauseLetter ? `(${clauseLetter})(${number})` : `(${number})`;
     }
+    // medium: the path from the Sentence, "Subclause (1)(b)(ii)"; long: the full number,
+    // "Subclause 3.1.6.12.(1)(b)(ii)" (Sentences 3.1.6.12.(2), 9.10.9.8.(4), 9.32.3.7.(4)).
+    const clausePart = clause ? `(${toAlphabetOrdinal(asNumber(clause) ?? Number.NaN)})` : '';
+    if (format === 'medium' && sentence) {
+      return withDivisionSuffix(`Subclause (${sentence})${clausePart}(${number})`);
+    }
+    if (format === 'long' && sentenceNumber) {
+      return withDivisionSuffix(`Subclause ${sentenceNumber}${clausePart}(${number})`);
+    }
     return withDivisionSuffix(`Subclause (${number})`);
   }
 

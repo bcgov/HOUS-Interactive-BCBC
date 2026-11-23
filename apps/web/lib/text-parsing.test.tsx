@@ -756,6 +756,16 @@ describe('parseTextWithMarkers - objective-based code references', () => {
     expect(objectiveRefs[0].props.objectiveId).toBe('nbc-obj-os1.5');
   });
 
+  it('labels a medium Subclause reference from its Sentence, as the PDF prints it', () => {
+    const { container } = render(<>{parseTextWithMarkers('referred to in [REF:internal:nbc.divB.part3.sect1.subsect6.art12.sent1.clause2.subclause2:medium] is', [], false)}</>);
+    expect(container.textContent).toContain('Subclause (1)(b)(ii)');
+  });
+
+  it('labels a long Subclause reference with its full number', () => {
+    const { container } = render(<>{parseTextWithMarkers('see [REF:internal:nbc.divB.part3.sect1.subsect6.art12.sent1.clause2.subclause2:long]', [], false)}</>);
+    expect(container.textContent).toContain('Subclause 3.1.6.12.(1)(b)(ii)');
+  });
+
   it('parses multiline spaced double-bracket references', () => {
     const input = '[ [REF:functional-statement:fs20] ,\n[REF:functional-statement:fs21] - [REF:sub-objective:nbc-obj-op2.3] ]';
     const nodes = parseTextWithMarkers(input, [], true);
