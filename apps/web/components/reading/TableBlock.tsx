@@ -149,6 +149,11 @@ const renderFormattedText = (
   let lastIndex = 0;
   let match: RegExpExecArray | null;
   let chunkIndex = 0;
+  // Words before this point (other table-note marks don't count): a mark there follows a value,
+  // e.g. "<bold>F3</bold>(14)" or "1.0L_{XC}(4)(6)", and is superscript as in the PDF.
+  const followsText = (index: number) => ({
+    followsText: normalizedText.slice(0, index).replace(/\[REF:table-note:[^\]]+\]/g, '').trim() !== '',
+  });
 
   while ((match = tokenRegex.exec(normalizedText)) !== null) {
     const matchStart = match.index;
@@ -164,7 +169,8 @@ const renderFormattedText = (
             interactive,
             [],
             localLists,
-            renderContext
+            renderContext,
+            followsText(lastIndex)
           )}
         </React.Fragment>
       );
@@ -175,28 +181,28 @@ const renderFormattedText = (
       const italicText = token.replace(/^<italic>/i, '').replace(/<\/italic>$/i, '');
       nodes.push(
         <em key={`table-italic-${chunkIndex}`}>
-          {parseTextWithMarkers(italicText, [], interactive, [], localLists, renderContext)}
+          {parseTextWithMarkers(italicText, [], interactive, [], localLists, renderContext, followsText(matchStart))}
         </em>
       );
     } else if (/^<bold>/i.test(token)) {
       const boldText = token.replace(/^<bold>/i, '').replace(/<\/bold>$/i, '');
       nodes.push(
         <strong key={`table-bold-${chunkIndex}`}>
-          {parseTextWithMarkers(boldText, [], interactive, [], localLists, renderContext)}
+          {parseTextWithMarkers(boldText, [], interactive, [], localLists, renderContext, followsText(matchStart))}
         </strong>
       );
     } else if (/^\^\{/.test(token)) {
       const superText = token.replace(/^\^\{/, '').replace(/\}$/, '');
       nodes.push(
         <sup key={`table-sup-${chunkIndex}`}>
-          {parseTextWithMarkers(superText, [], interactive, [], localLists, renderContext)}
+          {parseTextWithMarkers(superText, [], interactive, [], localLists, renderContext, followsText(matchStart))}
         </sup>
       );
     } else if (/^_\{/.test(token)) {
       const subText = token.replace(/^_\{/, '').replace(/\}$/, '');
       nodes.push(
         <sub key={`table-sub-${chunkIndex}`}>
-          {parseTextWithMarkers(subText, [], interactive, [], localLists, renderContext)}
+          {parseTextWithMarkers(subText, [], interactive, [], localLists, renderContext, followsText(matchStart))}
         </sub>
       );
     }
@@ -208,7 +214,7 @@ const renderFormattedText = (
   if (lastIndex < normalizedText.length) {
     nodes.push(
       <React.Fragment key={`table-text-chunk-${chunkIndex}`}>
-        {parseTextWithMarkers(normalizedText.slice(lastIndex), [], interactive, [], localLists, renderContext)}
+        {parseTextWithMarkers(normalizedText.slice(lastIndex), [], interactive, [], localLists, renderContext, followsText(lastIndex))}
       </React.Fragment>
     );
   }

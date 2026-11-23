@@ -1177,9 +1177,14 @@ export function parseTextWithMarkers(
   interactive: boolean = true,
   localEquations: TextEquationEntry[] = [],
   localLists: StructuredList[] = [],
-  renderContext?: ReferenceRenderContext
+  renderContext?: ReferenceRenderContext,
+  // followsText: the text is a piece of a longer one that has words before it (a table cell
+  // split at "<bold>F3</bold>" or "L_{XC}"), so a mark at its start is not alone in the cell.
+  options: { followsText?: boolean } = {}
 ): React.ReactNode[] {
   const sanitizedText = sanitizeLegacyPlaceholderTags(text);
+  const isAloneMark = (start: number) =>
+    !options.followsText && isStandaloneTableNoteMark(sanitizedText, start);
   const nodes: React.ReactNode[] = [];
   const markers: Marker[] = [];
   const getEquation = useEquationStore.getState().getEquation;
@@ -1562,7 +1567,7 @@ export function parseTextWithMarkers(
             // A table-note mark looks like any other table-note mark: normal weight, and
             // superscript only after a word or value.
             variant: isTableNote ? 'table-note' : 'note',
-            superscript: !isTableNote || !isStandaloneTableNoteMark(sanitizedText, marker.start),
+            superscript: !isTableNote || !isAloneMark(marker.start),
           })
         );
         lastIndex = skipWhitespaceBeforePunctuation(sanitizedText, marker.end);
@@ -1572,7 +1577,7 @@ export function parseTextWithMarkers(
       case 'tableNote': {
         // The PDF prints table-note marks as superscript after a word or value ("Grade⁽¹⁾",
         // "100⁽¹⁾"), and full size when the mark is the whole text ("(5)").
-        const standalone = isStandaloneTableNoteMark(sanitizedText, marker.start);
+        const standalone = isAloneMark(marker.start);
         nodes.push(
           React.createElement(
             standalone ? 'span' : 'sup',

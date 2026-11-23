@@ -1244,3 +1244,26 @@ describe('TableBlock', () => {
     expect(screen.getByText('Table 3.3.1.5.-A')).toBeInTheDocument();
   });
 });
+
+describe('TableBlock table-note marks after formatted text', () => {
+  const tableWith = (value: string) => ({
+    id: 'nbc.divBV2.part9.spectables1.table2', type: 'table', number: '9.10.3.1.-B', title: 'T',
+    headers: [['H']], rows: [{ cells: [{ content: [{ type: 'text', value }] }] }],
+  }) as any;
+
+  it('keeps a mark after bold text superscript ("F3(14)", Table 9.10.3.1.-B)', () => {
+    const { container } = render(<TableBlock table={tableWith('<bold>F3</bold>[REF:table-note:nbc.divBV2.part9.spectables1.table2.note14]')} interactive={false} />);
+    expect(container.querySelectorAll('td sup.table-note-mark')).toHaveLength(1);
+  });
+
+  it('keeps marks after a subscript superscript ("1.0L_{XC}(4)(6)", Table 4.1.3.2.-B)', () => {
+    const { container } = render(<TableBlock table={tableWith('1.0C + 1.0L_{XC}[REF:table-note:x.table2.note4][REF:table-note:x.table2.note6]')} interactive={false} />);
+    expect(container.querySelectorAll('td sup.table-note-mark')).toHaveLength(2);
+  });
+
+  it('still prints a mark that is the whole cell full size', () => {
+    const { container } = render(<TableBlock table={tableWith('[REF:table-note:x.table2.note5]')} interactive={false} />);
+    expect(container.querySelector('td sup.table-note-mark')).toBeNull();
+    expect(container.querySelector('td .table-note-mark--inline')).not.toBeNull();
+  });
+});
