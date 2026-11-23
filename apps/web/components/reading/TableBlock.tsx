@@ -132,7 +132,8 @@ const renderFormattedText = (
   text: string,
   interactive: boolean,
   renderContext?: ReferenceRenderContext,
-  localLists: StructuredList[] = []
+  localLists: StructuredList[] = [],
+  markOptions: { inlineMarks?: boolean } = {}
 ): React.ReactNode[] => {
   const normalizedText = text
     // Legacy placeholders used in some table content
@@ -153,6 +154,7 @@ const renderFormattedText = (
   // e.g. "<bold>F3</bold>(14)" or "1.0L_{XC}(4)(6)", and is superscript as in the PDF.
   const followsText = (index: number) => ({
     followsText: normalizedText.slice(0, index).replace(/\[REF:table-note:[^\]]+\]/g, '').trim() !== '',
+    inlineMarks: markOptions.inlineMarks,
   });
 
   while ((match = tokenRegex.exec(normalizedText)) !== null) {
@@ -1763,7 +1765,8 @@ export const TableBlock: React.FC<TableBlockProps> = ({
           )}
           {resolvedTitle && (
             <div className="table-block__title">
-              {renderFormattedText(resolvedTitle, interactive, tableRenderContext)}
+              {/* The PDF prints a title's note marks full size: "Importance Categories for Buildings(1)". */}
+              {renderFormattedText(resolvedTitle, interactive, tableRenderContext, [], { inlineMarks: true })}
             </div>
           )}
           {formingPartText && (

@@ -1180,11 +1180,13 @@ export function parseTextWithMarkers(
   renderContext?: ReferenceRenderContext,
   // followsText: the text is a piece of a longer one that has words before it (a table cell
   // split at "<bold>F3</bold>" or "L_{XC}"), so a mark at its start is not alone in the cell.
-  options: { followsText?: boolean } = {}
+  // inlineMarks: table-note marks print full size, as in a table title ("Buildings(1)" is one
+  // run at the title's size in the PDF).
+  options: { followsText?: boolean; inlineMarks?: boolean } = {}
 ): React.ReactNode[] {
   const sanitizedText = sanitizeLegacyPlaceholderTags(text);
   const isAloneMark = (start: number) =>
-    !options.followsText && isStandaloneTableNoteMark(sanitizedText, start);
+    Boolean(options.inlineMarks) || (!options.followsText && isStandaloneTableNoteMark(sanitizedText, start));
   const nodes: React.ReactNode[] = [];
   const markers: Marker[] = [];
   const getEquation = useEquationStore.getState().getEquation;

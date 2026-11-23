@@ -1267,3 +1267,15 @@ describe('TableBlock table-note marks after formatted text', () => {
     expect(container.querySelector('td .table-note-mark--inline')).not.toBeNull();
   });
 });
+
+describe('TableBlock title note marks', () => {
+  it('prints a note mark in the table title full size, as the PDF does', () => {
+    const table = { id: 'nbc.divB.part4.sect1.subsect2.art1.table1', type: 'table', number: '4.1.2.1',
+      title: 'Importance Categories for Buildings[REF:table-note:nbc.divB.part4.sect1.subsect2.art1.table1.note1]',
+      headers: [['H']], rows: [{ cells: [{ content: [{ type: 'text', value: 'x' }] }] }] } as any;
+    const { container } = render(<TableBlock table={table} interactive={false} />);
+    const title = container.querySelector('.table-block__title');
+    expect(title?.querySelector('sup')).toBeNull();
+    expect(title?.textContent).toBe('Importance Categories for Buildings(1)');
+  });
+});
