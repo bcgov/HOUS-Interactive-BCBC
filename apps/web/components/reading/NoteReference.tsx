@@ -14,13 +14,26 @@ interface NoteReferenceProps {
   referenceId: string;
   text: string;
   interactive?: boolean;
+  /** 'table-note': a mark of a table note, printed in normal weight as in the PDF. */
+  variant?: 'note' | 'table-note';
+  /** false: printed full size, e.g. a table-note mark that is the whole cell. */
+  superscript?: boolean;
 }
 
 export const NoteReference: React.FC<NoteReferenceProps> = ({ 
   referenceId, 
   text, 
-  interactive = true 
+  interactive = true,
+  variant = 'note',
+  superscript = true,
 }) => {
+  const Tag = superscript ? 'sup' : 'span';
+  const classes = [
+    'note-reference',
+    variant === 'table-note' ? 'note-reference--table-note' : '',
+    superscript ? '' : 'note-reference--inline',
+  ].filter(Boolean).join(' ');
+
   const handleClick = (e: React.MouseEvent) => {
     if (!interactive) {
       e.preventDefault();
@@ -40,11 +53,11 @@ export const NoteReference: React.FC<NoteReferenceProps> = ({
   };
 
   if (!interactive) {
-    return <sup className="note-reference note-reference--non-interactive">{text}</sup>;
+    return <Tag className={`${classes} note-reference--non-interactive`}>{text}</Tag>;
   }
 
   return (
-    <sup className="note-reference">
+    <Tag className={classes}>
       <a
         href={`#${referenceId}`}
         className="note-reference__link"
@@ -53,7 +66,7 @@ export const NoteReference: React.FC<NoteReferenceProps> = ({
       >
         {text}
       </a>
-    </sup>
+    </Tag>
   );
 };
 

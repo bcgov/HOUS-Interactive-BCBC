@@ -119,6 +119,20 @@ describe('FigureBlock', () => {
       expect(screen.getByText(/This is note one\./)).toBeInTheDocument();
     });
 
+    it('labels a figure note "(1)" as the PDF prints it, not "Note (1):"', () => {
+      const figure = {
+        ...baseFigure,
+        imageUrl: '/test.jpg',
+        notes: [
+          { id: 'nbc.divC.part2.sect3.subsect1.art2.figure1.note1', content: 'This is note one.' },
+        ],
+      };
+      const { container } = render(<FigureBlock figure={figure} />);
+      const note = container.querySelector('.figure-block__note');
+      expect(note?.textContent).toBe('(1) This is note one.');
+      expect(note?.querySelector('strong')).toBeNull();
+    });
+
     it('does not render notes section when notes array is empty', () => {
       const figure = { ...baseFigure, imageUrl: '/test.jpg', notes: [] };
       const { container } = render(<FigureBlock figure={figure} />);

@@ -30,6 +30,19 @@
   border-radius: var(--layout-border-radius-small, 2px);
 }
 
+/* Table-note marks are printed in normal weight in the PDF. */
+.note-reference--table-note .note-reference__link {
+  font-weight: inherit;
+}
+
+/* A table-note mark that is the whole cell is printed full size, not raised. */
+.note-reference--inline {
+  font-size: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+  margin-left: 0;
+}
+
 .note-reference--non-interactive {
   color: var(--typography-color-secondary, #6c6c6e);
   cursor: default;

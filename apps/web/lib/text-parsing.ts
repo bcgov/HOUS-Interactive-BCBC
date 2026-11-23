@@ -910,6 +910,23 @@ function formatInternalReference(referenceId: string, format?: InternalRefFormat
   return referenceId;
 }
 
+// A note of a table, e.g. nbc.divBV2.part9.appendix.appnote237.table1.note3 (a Notes-to-Part
+// table, written as an internal reference) or ...art11.table1.note5.
+const TABLE_NOTE_ID_PATTERN = /\.table\d+\.note\d+$/i;
+
+// Table-note marks in either form: [REF:table-note:<id>] or [REF:internal:<table note id>:short…].
+const TABLE_NOTE_MARK_PATTERN = /\[REF:(?:table-note:[^\]]+|internal:[^\]:]*\.table\d+\.note\d+(?::[^\]]*)?)\]/gi;
+
+/**
+ * The PDF prints a table-note mark as superscript when it follows a word or value
+ * ("Grade⁽¹⁾", "100⁽³⁾"), but full size when the mark is all there is, e.g. a cell
+ * that holds only "(5)" (Table 4.1.8.11). Other marks before it don't count as text,
+ * so "(1)(2)" alone is full size too.
+ */
+export function isStandaloneTableNoteMark(text: string, start: number): boolean {
+  return text.slice(0, start).replace(TABLE_NOTE_MARK_PATTERN, '').trim() === '';
+}
+
 function getSpectableTableNoteNumber(referenceId: string): string | null {
   const match = referenceId.match(
     /^nbc\.div[A-Za-z0-9]+\.part\d+\.spectables\d+\.table\d+\.note(\d+)$/i
@@ -1535,12 +1552,17 @@ export function parseTextWithMarkers(
           ? getNoteLabel(marker.noteId!)
           : marker.noteId!);
 
+        const isTableNote = TABLE_NOTE_ID_PATTERN.test(marker.noteId!);
         nodes.push(
           React.createElement(NoteReference, {
             key: `note-${marker.start}`,
             referenceId: marker.noteId!,
             text: displayText,
             interactive,
+            // A table-note mark looks like any other table-note mark: normal weight, and
+            // superscript only after a word or value.
+            variant: isTableNote ? 'table-note' : 'note',
+            superscript: !isTableNote || !isStandaloneTableNoteMark(sanitizedText, marker.start),
           })
         );
         lastIndex = skipWhitespaceBeforePunctuation(sanitizedText, marker.end);
@@ -1548,11 +1570,16 @@ export function parseTextWithMarkers(
       }
 
       case 'tableNote': {
-        // The PDF prints table-note marks as superscript: "Grade⁽¹⁾", "100⁽¹⁾".
+        // The PDF prints table-note marks as superscript after a word or value ("Grade⁽¹⁾",
+        // "100⁽¹⁾"), and full size when the mark is the whole text ("(5)").
+        const standalone = isStandaloneTableNoteMark(sanitizedText, marker.start);
         nodes.push(
           React.createElement(
-            'sup',
-            { key: `table-note-${marker.start}`, className: 'table-note-mark' },
+            standalone ? 'span' : 'sup',
+            {
+              key: `table-note-${marker.start}`,
+              className: standalone ? 'table-note-mark table-note-mark--inline' : 'table-note-mark',
+            },
             React.createElement(CrossReferenceLink, {
               referenceId: marker.tableNoteId!,
               displayText: getNoteLabel(marker.tableNoteId!),

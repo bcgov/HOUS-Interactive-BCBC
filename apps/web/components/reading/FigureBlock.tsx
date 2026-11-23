@@ -251,7 +251,8 @@ export const FigureBlock: React.FC<FigureBlockProps> = ({
         <div className="figure-block__notes">
           {figureNotes.map((note) => (
             <p key={note.id} className="figure-block__note">
-              <strong>{`Note (${getFigureNoteNumber(note.id)}): `}</strong>
+              {/* The PDF prints "(1) text" under "Notes to Figure …:", not "Note (1):". */}
+              <span className="figure-block__note-label">{`(${getFigureNoteNumber(note.id)}) `}</span>
               {parseTextWithMarkers(note.content, [], interactive, [], [], renderContext)}
             </p>
           ))}

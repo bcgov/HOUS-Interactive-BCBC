@@ -762,6 +762,58 @@ describe('parseTextWithMarkers - objective-based code references', () => {
     expect(container.textContent).toBe('Grade(1)');
   });
 
+  it('prints a table-note mark full size when it is the whole cell, as the PDF does', () => {
+    // Table 4.1.8.11: a cell that holds only "(5)".
+    const input = '[REF:table-note:nbc.divB.part4.sect1.subsect8.art11.table1.note5]';
+    const { container } = render(<>{parseTextWithMarkers(input, [], false)}</>);
+
+    expect(container.querySelector('sup')).toBeNull();
+    expect(container.querySelector('span.table-note-mark--inline')?.textContent).toBe('(5)');
+  });
+
+  it('prints marks that stand alone full size, also when several follow each other', () => {
+    const input =
+      '[REF:table-note:nbc.divB.part4.sect1.subsect8.art11.table1.note1][REF:table-note:nbc.divB.part4.sect1.subsect8.art11.table1.note2]';
+    const { container } = render(<>{parseTextWithMarkers(input, [], false)}</>);
+
+    expect(container.querySelector('sup')).toBeNull();
+    expect(container.textContent).toBe('(1)(2)');
+  });
+
+  it('keeps a second mark superscript when the first follows a value', () => {
+    const input =
+      'Kweight[REF:table-note:nbc.divB.part9.t.table4.note1][REF:table-note:nbc.divB.part9.t.table4.note2]';
+    const { container } = render(<>{parseTextWithMarkers(input, [], false)}</>);
+
+    expect(container.querySelectorAll('sup.table-note-mark')).toHaveLength(2);
+  });
+
+  it('renders a Notes-to-Part table note reference as a normal-weight superscript mark', () => {
+    // A-9.36.2.8.(1)-A: "3.34 (R19)(3)" where the mark is written as an internal short reference.
+    const input = '3.34 (R19)[REF:internal:nbc.divBV2.part9.appendix.appnote237.table1.note3:short]';
+    const { container } = render(<>{parseTextWithMarkers(input, [], true)}</>);
+
+    const sup = container.querySelector('sup.note-reference.note-reference--table-note');
+    expect(sup?.textContent).toBe('(3)');
+  });
+
+  it('prints a Notes-to-Part table note reference full size when it is the whole cell', () => {
+    const input = '[REF:internal:nbc.divBV2.part9.appendix.appnote118a.table1.note10:short]';
+    const { container } = render(<>{parseTextWithMarkers(input, [], true)}</>);
+
+    expect(container.querySelector('sup')).toBeNull();
+    expect(container.querySelector('span.note-reference--inline')?.textContent).toBe('(10)');
+  });
+
+  it('keeps other note references bold and superscript', () => {
+    const input = 'See[REF:internal:nbc.divB.part3.sect2.note1:short]';
+    const { container } = render(<>{parseTextWithMarkers(input, [], true)}</>);
+
+    const sup = container.querySelector('sup.note-reference');
+    expect(sup).not.toBeNull();
+    expect(sup?.classList.contains('note-reference--table-note')).toBe(false);
+  });
+
   it('parses multiline spaced double-bracket references', () => {
     const input = '[ [REF:functional-statement:fs20] ,\n[REF:functional-statement:fs21] - [REF:sub-objective:nbc-obj-op2.3] ]';
     const nodes = parseTextWithMarkers(input, [], true);
